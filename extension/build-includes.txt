@@ -1,4 +1,5 @@
 bootstrap.js
 install.rdf
 content
+lib
 chrome.manifest
