@@ -3,3 +3,4 @@ install.rdf
 content
 lib
 chrome.manifest
+domains.json

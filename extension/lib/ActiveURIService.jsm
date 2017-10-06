@@ -29,7 +29,7 @@ this.ActiveURIService = {
   trackedWindows: new Set(),
 
   // Objects listening to changes in the active URI
-  listeners: new Set(),
+  observers: new Set(),
 
   startup() {
     // Watch for newly-created windows
@@ -55,18 +55,18 @@ this.ActiveURIService = {
     }
   },
 
-  addListener(listener) {
-    this.listeners.add(listener);
+  addObserver(observer) {
+    this.observers.add(observer);
   },
 
-  removeListener(listener) {
-    this.listeners.delete(listener);
+  removeObserver(observer) {
+    this.observers.delete(observer);
   },
 
   setFocusedURI(uri) {
     this.focusedURI = uri;
-    for (const listener of this.listeners) {
-      listener.onFocusURI(uri);
+    for (const observer of this.observers) {
+      observer.observe(this, 'uriFocused', uri);
     }
   },
 

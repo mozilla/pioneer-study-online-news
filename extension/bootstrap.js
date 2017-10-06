@@ -5,9 +5,13 @@
 const { utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.importGlobalProperties(['fetch']);
 
 XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
+);
+XPCOMUtils.defineLazyModuleGetter(
+  this, "DwellTime", "resource://pioneer-study-online-news/lib/DwellTime.jsm",
 );
 
 const REASON_APP_STARTUP = 1;
@@ -33,14 +37,13 @@ this.Bootstrap = {
     }
   },
 
-  finishStartup() {
-    ActiveURIService.startup();
-    ActiveURIService.addListener(this);
-    this.onFocusURI(ActiveURIService.focusedURI);
-  },
+  async finishStartup() {
+    const domainResponse = await fetch("resource://pioneer-study-online-news/domains.json");
+    const domains = await domainResponse.json();
+    const trackedHosts = domains.map(d => d.domain);
 
-  onFocusURI(uri) {
-    Cu.reportError(`New focused URI: ${uri ? uri.spec : "Browser Chrome"}`);
+    ActiveURIService.startup();
+    DwellTime.startup(trackedHosts);
   },
 
   shutdown(data, reason) {
@@ -51,10 +54,11 @@ this.Bootstrap = {
       // It must already be removed!
     }
 
-    ActiveURIService.removeListener(this);
+    DwellTime.shutdown();
     ActiveURIService.shutdown();
 
     Cu.unload("resource://pioneer-study-online-news/lib/ActiveURIService.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/DwellTime.jsm");
   },
 
   uninstall() {},
