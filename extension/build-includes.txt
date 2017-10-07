@@ -1,0 +1,4 @@
+bootstrap.js
+install.rdf
+content
+chrome.manifest
