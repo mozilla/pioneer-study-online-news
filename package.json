@@ -1,0 +1,16 @@
+{
+  "name": "pioneer-study-online-news",
+  "version": "1.0.0",
+  "description": "A Pioneer study looking at online news consumption.",
+  "scripts": {
+    "build": "XPI=pioneer-study-online-news@mozilla.org.xpi bash ./bin/make-xpi.sh"
+  },
+  "keywords": [],
+  "author": "Mozilla",
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "mustache": "2.3.0",
+    "pioneer-studies-addon-utils": "1.0.1"
+  },
+  "dependencies": {}
+}

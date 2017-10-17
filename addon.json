@@ -1,0 +1,14 @@
+{
+  "addon": {
+    "version": "1.0.0",
+    "id": "pioneer-study-online-news@mozilla.org",
+    "name": "Pioneer Online News Study",
+    "minVersion": "55.0",
+    "maxVersion": "*",
+    "multiprocessCompatible": true,
+    "hasEmbeddedWebExtension": false,
+    "creator": "Mozilla",
+    "description": "A Pioneer study looking at online news consumption.",
+    "chrome": "pioneer-study-online-news"
+  }
+}
