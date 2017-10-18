@@ -26,6 +26,7 @@ this.DwellTime = {
 
   dwellStartTime: null, // Timestamp when the idle state or focused host last changed
   focusedHost: null, // Host of the currently-focused URI
+  focusedURL: null, // URL of the currently-focused URI
   userIsIdle: false, // Whether the user is currently idle or not
 
   startup(trackedHosts) {
@@ -54,9 +55,9 @@ this.DwellTime = {
     }
 
     if (this.trackedHosts.has(this.focusedHost)) {
-      let dwellTime = this.dwellTimes.get(this.focusedHost) || 0;
+      let dwellTime = this.dwellTimes.get(this.focusedURL) || 0;
       dwellTime += (now - this.dwellStartTime);
-      this.dwellTimes.set(this.focusedHost, dwellTime);
+      this.dwellTimes.set(this.focusedURL, dwellTime);
     }
   },
 
@@ -65,12 +66,15 @@ this.DwellTime = {
     this.logPreviousDwell(now);
 
     let host = null;
+    let url = null;
     if (uri && ACCEPTED_SCHEMES.has(uri.scheme)) {
       host = uri.host;
+      url = uri.spec;
     }
 
     this.dwellStartTime = now;
     this.focusedHost = host;
+    this.focusedURL = url;
   },
 
   onIdle() {
