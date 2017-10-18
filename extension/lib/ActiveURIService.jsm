@@ -32,8 +32,8 @@ this.ActiveURIService = {
   observers: new Set(),
 
   startup() {
-    // Watch for newly-created windows
     Services.obs.addObserver(this, "xul-window-registered");
+    Services.obs.addObserver(this, "xul-window-destroyed");
 
     // Register existing windows for tracking
     const windowList = Services.wm.getEnumerator(null);
