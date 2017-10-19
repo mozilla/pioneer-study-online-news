@@ -46,6 +46,20 @@ this.ActiveURIService = {
     this.onFocusWindow(mostRecentWindow);
   },
 
+  updateTrackedWindows() {
+    // Cleanup tracked domWindows.
+    // We have to do this because xul-window-destroyed doesn't come
+    // back with a pointer to the domWindow that is being destroyed.
+    for (const domWindow of this.trackedWindows) {
+      this.untrackWindow(domWindow);
+    }
+
+    const windowList = Services.wm.getEnumerator(null);
+    while (windowList.hasMoreElements()) {
+      this.trackWindow(windowList.getNext());
+    }
+  },
+
   shutdown() {
     Services.obs.removeObserver(this, "xul-window-registered");
 
@@ -96,12 +110,6 @@ this.ActiveURIService = {
     });
   },
 
-  onDestroyWindow(domWindow) {
-    if (this.trackedWindows.has(domWindow)) {
-      this.untrackWindow(domWindow);
-    }
-  },
-
   onFocusWindow(domWindow) {
     this.focusedWindow = domWindow;
     if (domWindow.gBrowser) {
@@ -130,7 +138,7 @@ this.ActiveURIService = {
         this.onRegisterWindow(getDOMWindow(subject));
         break;
       case "xul-window-destroyed":
-        this.onDestroyWindow(getDOMWindow(subject));
+        this.updateTrackedWindows();
         break;
     }
   },
