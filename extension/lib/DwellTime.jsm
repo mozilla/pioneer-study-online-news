@@ -6,6 +6,12 @@ const { interfaces: Ci, utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
+XPCOMUtils.defineLazyModuleGetter(this, "NewsStorage",
+  "resource://pioneer-study-online-news/lib/NewsStorage.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "ShieldLogger",
+  "resource://pioneer-study-online-news/lib/ShieldLogger.jsm");
+
 XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
 );
@@ -32,6 +38,7 @@ this.DwellTime = {
     IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
     ActiveURIService.addObserver(this);
     this.onFocusURI(ActiveURIService.focusedURI);
+    let promise = ShieldLogger.log("DwellTime started up!");
   },
 
   shutdown() {
@@ -55,6 +62,8 @@ this.DwellTime = {
     let dwellTime = this.dwellTimes.get(this.focusedURL) || 0;
     dwellTime += (now - this.dwellStartTime);
     this.dwellTimes.set(this.focusedURL, dwellTime);
+    let obj = {focused_url: this.focusedURL, dwell_time: dwellTime};
+    NewsStorage.put(obj);
   },
 
   onFocusURI(uri) {
@@ -87,7 +96,6 @@ this.DwellTime = {
 
     this.dwellStartTime = now;
     this.userIsIdle = false;
-
   },
 
   observe(subject, topic, data) {
