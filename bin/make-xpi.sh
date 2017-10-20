@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
 set -eu
+set -o pipefail
 
 BASE_DIR="$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")"
-EXTENSION_DIR="$BASE_DIR/extension"
 TMP_DIR=$(mktemp -d)
-DEST="${TMP_DIR}/pioneer-study-online-news"
-mkdir -p $DEST
+DEST="${TMP_DIR}/addon"
+XPI="${XPI:-addon.xpi}"
+
+mkdir -p "$DEST"
 
 # deletes the temp directory
 function cleanup {
@@ -14,12 +16,16 @@ function cleanup {
 }
 trap cleanup EXIT
 
-while read -r LINE || [[ -n "${LINE}" ]]; do
-  mkdir -p "$(dirname "${DEST}/${LINE}")"
-  cp -r "${EXTENSION_DIR}/${LINE}" "$(dirname "${DEST}/${LINE}")"
-done < "${EXTENSION_DIR}/build-includes.txt"
+# fill templates, could be fancier
+node_modules/.bin/mustache addon.json templates/install.rdf.mustache > "${DEST}/install.rdf"
+node_modules/.bin/mustache addon.json templates/chrome.manifest.mustache > "${DEST}/chrome.manifest"
+cp node_modules/pioneer-studies-addon-utils/dist/PioneerUtils.jsm "${DEST}"
 
-pushd $DEST
-zip -r pioneer-study-online-news.xpi *
-mv pioneer-study-online-news.xpi $BASE_DIR
+cp -rp extension/* "$DEST"
+
+pushd "$DEST"
+zip -r "$DEST/${XPI}" ./*
+mkdir -p "$BASE_DIR/dist"
+mv "${XPI}" "$BASE_DIR/dist"
+echo "XPI: ${BASE_DIR}/dist/${XPI}"
 popd
