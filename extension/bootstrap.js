@@ -38,12 +38,8 @@ this.Bootstrap = {
   },
 
   async finishStartup() {
-    const domainResponse = await fetch("resource://pioneer-study-online-news/domains.json");
-    const domains = await domainResponse.json();
-    const trackedHosts = domains.map(d => d.domain);
-
     ActiveURIService.startup();
-    DwellTime.startup(trackedHosts);
+    DwellTime.startup();
   },
 
   shutdown(data, reason) {

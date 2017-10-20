@@ -21,7 +21,6 @@ const IDLE_DELAY_SECONDS = Services.prefs.getIntPref(
 );
 
 this.DwellTime = {
-  trackedHosts: new Set(),
   dwellTimes: new Map(),
 
   dwellStartTime: null, // Timestamp when the idle state or focused host last changed
@@ -29,8 +28,7 @@ this.DwellTime = {
   focusedURL: null, // URL of the currently-focused URI
   userIsIdle: false, // Whether the user is currently idle or not
 
-  startup(trackedHosts) {
-    this.trackedHosts = new Set(trackedHosts);
+  startup() {
     IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
     ActiveURIService.addObserver(this);
     this.onFocusURI(ActiveURIService.focusedURI);
@@ -54,11 +52,9 @@ this.DwellTime = {
       return;
     }
 
-    if (this.trackedHosts.has(this.focusedHost)) {
-      let dwellTime = this.dwellTimes.get(this.focusedURL) || 0;
-      dwellTime += (now - this.dwellStartTime);
-      this.dwellTimes.set(this.focusedURL, dwellTime);
-    }
+    let dwellTime = this.dwellTimes.get(this.focusedURL) || 0;
+    dwellTime += (now - this.dwellStartTime);
+    this.dwellTimes.set(this.focusedURL, dwellTime);
   },
 
   onFocusURI(uri) {
