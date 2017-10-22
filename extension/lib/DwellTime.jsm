@@ -63,7 +63,8 @@ this.DwellTime = {
     dwellTime += (now - this.dwellStartTime);
     this.dwellTimes.set(this.focusedURL, dwellTime);
     let obj = {focused_url: this.focusedURL, dwell_time: dwellTime};
-    NewsStorage.put(obj);
+    let promise = ShieldLogger.log("stored something");
+    //NewsStorage.put(obj);
   },
 
   onFocusURI(uri) {
