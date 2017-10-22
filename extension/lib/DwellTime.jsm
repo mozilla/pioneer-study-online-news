@@ -31,7 +31,7 @@ this.DwellTime = {
 
   dwellStartTime: null, // Timestamp when the idle state or focused host last changed
   focusedHost: null, // Host of the currently-focused URI
-  focusedURL: null, // URL of the currently-focused URI
+  focusedUrl: null, // URL of the currently-focused URI
   userIsIdle: false, // Whether the user is currently idle or not
 
   startup() {
@@ -59,12 +59,11 @@ this.DwellTime = {
       return;
     }
 
-    let dwellTime = this.dwellTimes.get(this.focusedURL) || 0;
+    let dwellTime = this.dwellTimes.get(this.focusedUrl) || 0;
     dwellTime += (now - this.dwellStartTime);
-    this.dwellTimes.set(this.focusedURL, dwellTime);
-    let obj = {focused_url: this.focusedURL, dwell_time: dwellTime};
-    let promise = ShieldLogger.log("stored something");
-    //NewsStorage.put(obj);
+    this.dwellTimes.set(this.focusedUrl, dwellTime);
+    let obj = {focusedUrl: this.focusedUrl, dwellTime: dwellTime};
+    NewsStorage.put(obj);
   },
 
   onFocusURI(uri) {
@@ -80,7 +79,7 @@ this.DwellTime = {
 
     this.dwellStartTime = now;
     this.focusedHost = host;
-    this.focusedURL = url;
+    this.focusedUrl = url;
   },
 
   onIdle() {

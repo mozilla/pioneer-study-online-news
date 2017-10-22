@@ -2,6 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const { interfaces: Ci, utils: Cu } = Components;
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
 XPCOMUtils.defineLazyModuleGetter(this,
   "IndexedDB", 
   "resource://gre/modules/IndexedDB.jsm");
@@ -24,12 +27,12 @@ const DB_OPTIONS = {
  */
 
 let databasePromise;
-  
+
 async function getDatabase() {
   if (!databasePromise) {
     databasePromise = IndexedDB.open(DB_NAME, DB_OPTIONS, (db) => {
       db.createObjectStore(DB_NAME, {
-        keyPath: "focusedURL",
+        keyPath: "focusedUrl",
         autoIncrement: false,
       });
     });
@@ -76,10 +79,10 @@ this.NewsStorage = {
   async put(pingData) {
     const ping = Object.assign({ timestamp: new Date() }, pingData);
     const db = await getDatabase();
-    let result = getStore(db).add(ping);
-    // TODO: stringify the ping to JSON catching any errors along the
-    // way and send them to the logger
-    let promise = ShieldLogger.log(`stored something`);
-    return result;
+    return getStore(db).add(ping).then(success => {
+      ShieldLogger.log(`stored: ${success}`);
+    }, reason => {
+      ShieldLogger.log(`error out with: ${reason}`);
+    });
   },
 };
