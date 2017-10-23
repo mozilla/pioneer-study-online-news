@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { utils: Cu } = Components;
+const { interfaces: Ci, utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(['fetch']);
@@ -22,6 +22,9 @@ XPCOMUtils.defineLazyModuleGetter(
 XPCOMUtils.defineLazyModuleGetter(
   this, "Phases", "resource://pioneer-study-online-news/lib/Phases.jsm"
 );
+XPCOMUtils.defineLazyModuleGetter(
+  this, "InterventionWindow", "resource://pioneer-study-online-news/lib/InterventionWindow.jsm",
+);
 
 const TIMER_NAME = "pioneer-online-news-study-state";
 const REASONS = {
@@ -36,6 +39,7 @@ const REASONS = {
 };
 const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
 const STATE_PREF = "extensions.pioneer-online-news.state";
+
 
 this.Bootstrap = {
   install() {},
@@ -65,6 +69,41 @@ this.Bootstrap = {
     ActiveURIService.startup();
     DwellTime.startup();
     Phases.startup();
+
+    const windowEnumerator = Services.wm.getEnumerator("navigator:browser");
+    while (windowEnumerator.hasMoreElements()) {
+      const window = windowEnumerator.getNext();
+      const interventionWindow = new InterventionWindow(window);
+      interventionWindow.startup();
+
+      // Show a doorhanger for testing.
+      this.doorhangerInterventionTreatment(window);
+    }
+  },
+
+  doorhangerInterventionTreatment(browserWindow) {
+    const document = browserWindow.window.document;
+    let panel = document.getElementById("online-news-intervention-panel");
+    if (panel === null) { // create the panel
+      panel = document.createElement("panel");
+      panel.setAttribute("id", "online-news-intervention-panel");
+      panel.setAttribute("class", "no-padding-panel");
+      panel.setAttribute("type", "arrow");
+      panel.setAttribute("noautofocus", true);
+      panel.setAttribute("level", "parent");
+
+      const embeddedBrowser = document.createElement("browser");
+      embeddedBrowser.setAttribute("id", "online-news-intervention-doorhanger");
+      embeddedBrowser.setAttribute("src", "resource://pioneer-study-online-news/content/doorhanger-intervention.html");
+      embeddedBrowser.setAttribute("type", "content");
+      embeddedBrowser.setAttribute("disableglobalhistory", "true");
+      embeddedBrowser.setAttribute("flex", "1");
+
+      panel.appendChild(embeddedBrowser);
+      document.getElementById("mainPopupSet").appendChild(panel);
+    }
+    const burgerMenu = document.getElementById("PanelUI-menu-button");
+    panel.openPopup(burgerMenu, "bottomcenter topright", 0, 0, false, false);
   },
 
   shutdown(data, reason) {
@@ -83,11 +122,21 @@ this.Bootstrap = {
     ActiveURIService.shutdown();
     Phases.shutdown();
 
+    const windowEnumerator = Services.wm.getEnumerator("navigator:browser");
+    while (windowEnumerator.hasMoreElements()) {
+      const window = windowEnumerator.getNext();
+      if (InterventionWindow.has(window)) {
+        const browserWindow = InterventionWindow.get(window);
+        browserWindow.shutdown();
+      }
+    }
+
     Cu.unload("resource://pioneer-study-online-news/Config.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/ActiveURIService.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/DwellTime.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/Phases.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/State.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/InterventionWindow.jsm");
   },
 
   uninstall() {},

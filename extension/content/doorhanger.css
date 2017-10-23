@@ -1,0 +1,29 @@
+.bar {
+    margin: 0 auto;
+    width: 300px;
+}
+
+.bar > .legend {
+    display: flex;
+    position: relative;
+    width: 300px;
+}
+
+.bar > .legend > span {
+    flex: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.bar > .legend > span:last-child {
+    text-align: right;
+}
+
+#online-news-bias-rating > rect {
+    fill: rgba(0, 0, 0, 0.2);
+}
+
+#online-news-bias-rating > rect.fill {
+    fill: #000;
+}

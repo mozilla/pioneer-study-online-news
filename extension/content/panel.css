@@ -1,0 +1,8 @@
+#online-news-intervention-panel {
+  width: 400px;
+  height: 96px;
+}
+
+.no-padding-panel > .panel-arrowcontainer > .panel-arrowcontent {
+  padding: 0 !important;
+}
