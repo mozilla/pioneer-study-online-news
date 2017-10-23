@@ -1,0 +1,28 @@
+body, html {
+    background: #eee;
+    color: #666;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100%;
+    line-height: 140%;
+    margin: 0;
+    padding: 0;
+}
+
+article {
+    box-sizing: border-box;
+    height: 100%;
+    padding: 20px;
+    position: relative;
+}
+
+article > footer {
+    bottom: 20px;
+    left: 0;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+
+.icon {
+    width: 32px;
+}
