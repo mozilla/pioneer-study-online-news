@@ -61,11 +61,18 @@ this.Phases = {
     const now = Date.now();
     const sinceLastTransition = now - state.lastTransition;
     if (phase.duration && sinceLastTransition >= phase.duration) {
-      state = State.update({ phaseName: phase.next, lastTransition: Date.now() });
-      phase = Config.phases[state.phaseName];
-      if (!phase) {
-        throw new Error(`Unknown next phase ${state.phaseName}`);
-      }
+      this.gotoNextPhase();
+    }
+  },
+
+  /** Unconditionally goes to the next phase. */
+  gotoNextPhase() {
+    let state = State.read();
+    let phase = Config.phases[state.phaseName];
+    state = State.update({ phaseName: phase.next, lastTransition: Date.now() });
+    phase = Config.phases[state.phaseName];
+    if (!phase) {
+      throw new Error(`Unknown next phase ${state.phaseName}`);
     }
 
     if (phase.lastPhase) {
@@ -103,6 +110,8 @@ this.Phases = {
         // TODO: add pioneerID and utm_source parameters to surveyURL
         const tab = recentWindow.gBrowser.loadOneTab(phase.surveyURL, { inBackground: false });
       }
+    } else if (phase.surveyOnly) {
+      this.gotoNextPhase();
     }
   },
 

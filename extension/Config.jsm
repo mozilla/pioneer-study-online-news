@@ -34,6 +34,9 @@ const Config = {
    * @property {number?} promptRepeat
    *    Optional. Number of times to prompt the user to view the
    *    surveyURL. Defaults to 3.
+   * @property {boolean?} surveyOnly
+   *    Once a survey has been given to the user, go to the next
+   *    phase, regardless of the time spend.
    * @property {boolean?} lastPhase
    *    Optional. If true, upon reaching this state the study will end.
    */
@@ -44,20 +47,27 @@ const Config = {
     preTreatment: {
       duration: 5000, // 3 * WEEK,
       next: 'treatment',
-      surveyURL: "data:text/plain;charset=UTF-8,online-news phase = preTreatment",
+      surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-1",
     },
 
     treatment: {
       duration: 5000, // 3 * WEEK,
       next: 'postTreatment',
-      surveyURL: "data:text/plain;charset=UTF-8,online-news phase = treatment",
+      surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-2",
       promptRepeat: 2,
     },
 
     postTreatment: {
       duration: 5000, // 3 * WEEK,
+      next: 'postStudy',
+      surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-3",
+    },
+
+    postStudy: {
+      duration: 5000, // 1 * WEEK,
+      surveyOnly: true,
       next: 'studyEnd',
-      surveyURL: "data:text/plain;charset=UTF-8,online-news phase = postTreatment",
+      surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-4",
     },
 
     studyEnd: {
