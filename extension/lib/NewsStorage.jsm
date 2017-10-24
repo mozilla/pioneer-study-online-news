@@ -3,12 +3,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const { interfaces: Ci, utils: Cu } = Components;
+
+const UPLOAD_DATE_PREF = "pioneer.study.online.news.upload.date";
+
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this,
-  "IndexedDB", 
+  "config",
+  "resource://pioneer-study-online-news/Config.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this,
+  "IndexedDB",
   "resource://gre/modules/IndexedDB.jsm");
 
+XPCOMUtils.defineLazyModuleGetter(this, "PioneerUtils",
+  "resource://pioneer-study-online-news/PioneerUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "ShieldLogger",
   "resource://pioneer-study-online-news/lib/ShieldLogger.jsm");
@@ -55,7 +65,19 @@ function getStore(db) {
   return db.objectStore(DB_NAME, "readwrite");
 }
 
+function isonow() {
+  function pad(number) {
+    if (number < 10) {
+      return '0' + number;
+    }
+    return number;
+  }
+  let d = new Date();
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`;
+};
+
 this.NewsStorage = {
+
   async clear() {
     const db = await getDatabase();
     await getStore(db).clear();
@@ -74,6 +96,26 @@ this.NewsStorage = {
     const db = await getDatabase();
     const allDBPings = await getStore(db).getAll();
     return allDBPings;
+  },
+
+  async uploadPings() {
+    // upload ping dataset at the most once a day
+
+    let payload = await getAllPings();
+    if (Services.prefs.getCharPref(UPLOAD_DATE_PREF, "") !== isonow()) {
+      this.pioneerUtils.submitEncryptedPing(payload).then(() => {
+        this.clear().then(() => {
+          Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
+        });
+      })
+    }
+
+    // Call this method once a day
+    setTimeout(() => {
+      this.uploadPings();
+    }, 24*60*60);
+
+    ShieldLogger.log("uploadPings called");
   },
 
   async put(pingData) {
