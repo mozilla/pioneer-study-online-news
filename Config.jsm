@@ -8,7 +8,7 @@ const EXPORTED_SYMBOLS = ["config"];
 
 const config = {
   pioneer: {
-    studyName: "example",  // this name must match the pipeline schema to be used
+    studyName: "pioneer-study-online-news",  // this name must match the pipeline schema to be used
     studyVersion: 1,
   },
   async isEligible() {
