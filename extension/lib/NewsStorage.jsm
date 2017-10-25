@@ -121,10 +121,21 @@ this.NewsStorage = {
   async put(pingData) {
     const ping = Object.assign({ timestamp: new Date() }, pingData);
     const db = await getDatabase();
-    return getStore(db).add(ping).then(success => {
-      ShieldLogger.log(`stored: ${success}`);
+    // This is ugly, but invoking 
+    // `getStore(db).put` doesn't seem to match up to
+    // https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/put
+    // Invoking a put() always errors out and doesn't call the failure
+    // branch of the promise.  The error in the debugger is:
+    // "DataError: Data provided to an operation does not meet
+    // requirements."
+    getStore(db).delete(ping.focusedUrl).then(() => {
+      getStore(db).add(ping).then(() => {
+        ShieldLogger.log(`success! stored the ping`);
+      }, reason => {
+        ShieldLogger.log(`error out add with: ${reason}`);
+      });
     }, reason => {
-      ShieldLogger.log(`error out with: ${reason}`);
+      ShieldLogger.log(`error out delete with: ${reason}`);
     });
   },
 };
