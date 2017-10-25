@@ -2,12 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { Constructor: Cc, interfaces: Ci, utils: Cu } = Components;
+const { interfaces: Ci, utils: Cu } = Components;
 
 const UPLOAD_DATE_PREF = "pioneer.study.online.news.upload.date";
-
-const Timer = Cc("@mozilla.org/timer;1", "nsITimer", "initWithCallback");
-
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -33,23 +30,6 @@ const DB_OPTIONS = {
   version: 1,
   storage: "persistent",
 };
-
-// Schedule uploads to run on a 3 hour interval
-// Reduce this interval to test the uploads
-const DELAY_TIME = 1000 * 60 * 60 * 3;
-
-function delay(timeout, func) {
-  let timer = new Timer(function () {
-    // Remove the reference so that it can be reaped.
-    delete delay.timers[idx];
-    func();
-  }, timeout, Ci.nsITimer.TYPE_ONE_SHOT);
-
-  // Store a reference to the timer so that it's not reaped before it fires.
-  let idx = delay.timers.push(timer) - 1;
-  return idx;
-}
-delay.timers = [];
 
 
 /**
@@ -133,24 +113,12 @@ this.NewsStorage = {
           this.clear().then(() => {
             Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
             ShieldLogger.log(`UPLOAD_DATE_PREF was set to now`);
-
-            // Call this method once every 6 hours
-            ShieldLogger.log("Setting next scheduled upload");
-            delay(DELAY_TIME, this.uploadPings.bind(this));
-            ShieldLogger.log("uploadPings completed");
           });
         }, reason => {
           ShieldLogger.log("pings failed to upload");
-          // Call this method once every 6 hours
-          ShieldLogger.log("Setting next scheduled upload");
-          delay(DELAY_TIME, this.uploadPings.bind(this));
-          ShieldLogger.log("uploadPings completed");
         });
       } else {
           ShieldLogger.log("Data was already uploaded today");
-          ShieldLogger.log("Setting next scheduled upload");
-          delay(DELAY_TIME, this.uploadPings.bind(this));
-          ShieldLogger.log("uploadPings completed");
       }
     });
 

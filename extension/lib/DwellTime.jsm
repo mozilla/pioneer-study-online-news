@@ -5,6 +5,7 @@
 const { interfaces: Ci, utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/Timer.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "NewsStorage",
   "resource://pioneer-study-online-news/lib/NewsStorage.jsm");
@@ -25,6 +26,9 @@ const ACCEPTED_SCHEMES = new Set(['http', 'https']);
 const IDLE_DELAY_SECONDS = Services.prefs.getIntPref(
   "extensions.pioneer-study-online-news.idleDelaySeconds", 5,
 );
+// Schedule uploads to run on a 3 hour interval
+// Reduce this interval to test the uploads
+const DELAY_TIME = 1000 * 3 * 60 * 60;
 
 this.DwellTime = {
   dwellTimes: new Map(),
@@ -37,9 +41,12 @@ this.DwellTime = {
   startup() {
     IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
     ActiveURIService.addObserver(this);
-    NewsStorage.uploadPings();
     this.onFocusURI(ActiveURIService.focusedURI);
     let promise = ShieldLogger.log("DwellTime started up!");
+
+    NewsStorage.uploadPings();
+    setInterval(NewsStorage.uploadPings.bind(NewsStorage), DELAY_TIME);
+
   },
 
   shutdown() {
