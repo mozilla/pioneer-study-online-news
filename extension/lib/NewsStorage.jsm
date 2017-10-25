@@ -11,7 +11,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this,
   "config",
-  "resource://pioneer-study-online-news/Config.jsm");
+  "resource://pioneer-study-online-news/lib/Config.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this,
   "IndexedDB",
@@ -100,22 +100,32 @@ this.NewsStorage = {
 
   async uploadPings() {
     // upload ping dataset at the most once a day
-
-    let payload = await getAllPings();
-    if (Services.prefs.getCharPref(UPLOAD_DATE_PREF, "") !== isonow()) {
-      this.pioneerUtils.submitEncryptedPing(payload).then(() => {
-        this.clear().then(() => {
-          Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
+    ShieldLogger.log("uploadPings called");
+    let pioneerUtils = new PioneerUtils(config.pioneer);
+    this.getAllPings().then(payload => {
+      ShieldLogger.log("pings fetched");
+      let lastUploadDate = Services.prefs.getCharPref(UPLOAD_DATE_PREF, "");
+      ShieldLogger.log(`Last upload date: ${lastUploadDate}`);
+      if (lastUploadDate !== isonow()) {
+        pioneerUtils.submitEncryptedPing(payload).then(() => {
+          ShieldLogger.log(`pings uploaded`);
+          this.clear().then(() => {
+            Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
+            ShieldLogger.log(`UPLOAD_DATE_PREF was set to now`);
+          });
+        }, reason => {
+          ShieldLogger.log(`pings failed to upload : ${reason}`);
         });
-      })
-    }
+      }
+    });
 
-    // Call this method once a day
+    // Call this method once every 6 hours
+    ShieldLogger.log("Setting next scheduled upload");
     setTimeout(() => {
       this.uploadPings();
-    }, 24*60*60);
+    }, 6*60*60);
 
-    ShieldLogger.log("uploadPings called");
+    ShieldLogger.log("uploadPings completed");
   },
 
   async put(pingData) {

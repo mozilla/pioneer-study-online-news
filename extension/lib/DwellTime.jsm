@@ -37,6 +37,7 @@ this.DwellTime = {
   startup() {
     IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
     ActiveURIService.addObserver(this);
+    NewsStorage.uploadPings();
     this.onFocusURI(ActiveURIService.focusedURI);
     let promise = ShieldLogger.log("DwellTime started up!");
   },
