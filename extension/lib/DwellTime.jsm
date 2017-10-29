@@ -31,12 +31,8 @@ const IDLE_DELAY_SECONDS = Services.prefs.getIntPref(
 const DELAY_TIME = 1000 * 3 * 60 * 60;
 
 this.DwellTime = {
-  dwellTimes: new Map(),
-
   dwellStartTime: null, // Timestamp when the idle state or focused host last changed
-  focusedHost: null, // Host of the currently-focused URI
   focusedUrl: null, // URL of the currently-focused URI
-  userIsIdle: false, // Whether the user is currently idle or not
 
   startup() {
     IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
@@ -46,7 +42,6 @@ this.DwellTime = {
 
     NewsStorage.uploadPings();
     setInterval(NewsStorage.uploadPings.bind(NewsStorage), DELAY_TIME);
-
   },
 
   shutdown() {
@@ -58,25 +53,21 @@ this.DwellTime = {
    * Called before the idle state or the currently focused URI changes. Logs the
    * dwell time on the previous hostname.
    */
-  logPreviousDwell(now) {
+  logPreviousDwell(idle_tag, now) {
     // dwellStartTime is null on startup
-    // focusedHost is null if the user was looking at a non-browser window
-    // userIsIdle is true if the user was not active
-    // If any of these is the case, we don't log activity.
-    if (!this.dwellStartTime || !this.focusedHost || this.userIsIdle) {
+    // focusedUrl is null if the user was looking at a non-browser window
+    // If this is the case, we don't log activity.
+    if (!this.focusedUrl) {
       return;
     }
 
-    let dwellTime = this.dwellTimes.get(this.focusedUrl) || 0;
-    dwellTime += (now - this.dwellStartTime);
-    this.dwellTimes.set(this.focusedUrl, dwellTime);
-    let obj = {focusedUrl: this.focusedUrl, dwellTime: dwellTime};
+    let obj = {focusedUrl: this.focusedUrl, state: idle_tag, timestamp: now};
     NewsStorage.put(obj);
   },
 
   onFocusURI(uri) {
     const now = Date.now();
-    this.logPreviousDwell(now);
+    this.logPreviousDwell('onfocus', now);
 
     let host = null;
     let url = null;
@@ -85,25 +76,17 @@ this.DwellTime = {
       url = uri.spec;
     }
 
-    this.dwellStartTime = now;
-    this.focusedHost = host;
     this.focusedUrl = url;
   },
 
   onIdle() {
     const now = Date.now();
-    this.logPreviousDwell(now);
-
-    this.dwellStartTime = now;
-    this.userIsIdle = true;
+    this.logPreviousDwell('idle-start', now);
   },
 
   onIdleBack() {
     const now = Date.now();
-    this.logPreviousDwell(now);
-
-    this.dwellStartTime = now;
-    this.userIsIdle = false;
+    this.logPreviousDwell('idle-end', now);
   },
 
   observe(subject, topic, data) {

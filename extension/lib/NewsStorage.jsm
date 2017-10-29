@@ -43,7 +43,7 @@ async function getDatabase() {
   if (!databasePromise) {
     databasePromise = IndexedDB.open(DB_NAME, DB_OPTIONS, (db) => {
       db.createObjectStore(DB_NAME, {
-        keyPath: "focusedUrl",
+        keyPath: "timestamp",
         autoIncrement: false,
       });
     });
@@ -110,6 +110,7 @@ this.NewsStorage = {
       if (lastUploadDate !== isonow()) {
         pioneerUtils.submitEncryptedPing(payload).then(() => {
           ShieldLogger.log(`pings uploaded`);
+          ShieldLogger.log(`pings uploaded ${JSON.stringify(payload)}`);
           this.clear().then(() => {
             Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
             ShieldLogger.log(`UPLOAD_DATE_PREF was set to now`);
@@ -125,7 +126,7 @@ this.NewsStorage = {
   },
 
   async put(pingData) {
-    const ping = Object.assign({ timestamp: new Date() }, pingData);
+    const ping = pingData;
     const db = await getDatabase();
     // This is ugly, but invoking 
     // `getStore(db).put` doesn't seem to match up to
@@ -134,7 +135,8 @@ this.NewsStorage = {
     // branch of the promise.  The error in the debugger is:
     // "DataError: Data provided to an operation does not meet
     // requirements."
-    getStore(db).delete(ping.focusedUrl).then(() => {
+    // Pings are strictly timestamp ordered.
+    getStore(db).delete(ping.timestamp).then(() => {
       getStore(db).add(ping).then(() => {
         ShieldLogger.log(`success! stored the ping`);
       }, reason => {
