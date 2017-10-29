@@ -20,9 +20,6 @@ XPCOMUtils.defineLazyModuleGetter(this,
 XPCOMUtils.defineLazyModuleGetter(this, "PioneerUtils",
   "resource://pioneer-study-online-news/PioneerUtils.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "ShieldLogger",
-  "resource://pioneer-study-online-news/lib/ShieldLogger.jsm");
-
 this.EXPORTED_SYMBOLS = ["NewsStorage"];
 
 const DB_NAME = "online-news-study";
@@ -101,25 +98,17 @@ this.NewsStorage = {
 
   async uploadPings() {
     // upload ping dataset at the most once a day
-    ShieldLogger.log("uploadPings called");
     let pioneerUtils = new PioneerUtils(config.pioneer);
     this.getAllPings().then(payload => {
-      ShieldLogger.log("pings fetched");
       let lastUploadDate = Services.prefs.getCharPref(UPLOAD_DATE_PREF, "");
-      ShieldLogger.log(`Last upload date: ${lastUploadDate}`);
       if (lastUploadDate !== isonow()) {
         pioneerUtils.submitEncryptedPing({entries:payload}).then(() => {
-          ShieldLogger.log(`pings uploaded`);
-          ShieldLogger.log(`pings uploaded ${JSON.stringify(payload)}`);
           this.clear().then(() => {
             Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
-            ShieldLogger.log(`UPLOAD_DATE_PREF was set to now`);
           });
         }, reason => {
-          ShieldLogger.log("pings failed to upload");
         });
       } else {
-          ShieldLogger.log("Data was already uploaded today");
       }
     });
 
@@ -138,12 +127,9 @@ this.NewsStorage = {
     // Pings are strictly timestamp ordered.
     getStore(db).delete(ping.timestamp).then(() => {
       getStore(db).add(ping).then(() => {
-        ShieldLogger.log(`success! stored the ping`);
       }, reason => {
-        ShieldLogger.log(`error out add with: ${reason}`);
       });
     }, reason => {
-      ShieldLogger.log(`error out delete with: ${reason}`);
     });
   },
 };

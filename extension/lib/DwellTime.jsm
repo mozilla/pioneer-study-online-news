@@ -10,9 +10,6 @@ Cu.import("resource://gre/modules/Timer.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "NewsStorage",
   "resource://pioneer-study-online-news/lib/NewsStorage.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "ShieldLogger",
-  "resource://pioneer-study-online-news/lib/ShieldLogger.jsm");
-
 XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
 );
@@ -38,8 +35,6 @@ this.DwellTime = {
     IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
     ActiveURIService.addObserver(this);
     this.onFocusURI(ActiveURIService.focusedURI);
-    let promise = ShieldLogger.log("DwellTime started up!");
-
     NewsStorage.uploadPings();
     setInterval(NewsStorage.uploadPings.bind(NewsStorage), DELAY_TIME);
   },
@@ -62,7 +57,7 @@ this.DwellTime = {
     }
 
     let unixTs = Math.round(now/1000);
-    let obj = {url: this.focusedUrl, description: idle_tag, timestamp: unitTs};
+    let obj = {url: this.focusedUrl, details: idle_tag, timestamp: unitTs};
     NewsStorage.put(obj);
   },
 
