@@ -108,7 +108,7 @@ this.NewsStorage = {
       let lastUploadDate = Services.prefs.getCharPref(UPLOAD_DATE_PREF, "");
       ShieldLogger.log(`Last upload date: ${lastUploadDate}`);
       if (lastUploadDate !== isonow()) {
-        pioneerUtils.submitEncryptedPing(payload).then(() => {
+        pioneerUtils.submitEncryptedPing({entries:payload}).then(() => {
           ShieldLogger.log(`pings uploaded`);
           ShieldLogger.log(`pings uploaded ${JSON.stringify(payload)}`);
           this.clear().then(() => {

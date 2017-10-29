@@ -61,7 +61,8 @@ this.DwellTime = {
       return;
     }
 
-    let obj = {focusedUrl: this.focusedUrl, state: idle_tag, timestamp: now};
+    let unixTs = Math.round(now/1000);
+    let obj = {url: this.focusedUrl, description: idle_tag, timestamp: unitTs};
     NewsStorage.put(obj);
   },
 
