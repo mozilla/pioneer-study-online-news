@@ -8,8 +8,8 @@ const DAY = 24 * HOUR;
 const WEEK = 7 * DAY;
 
 const Config = {
-  studyName: "news",
-  schemaVersion: 1,
+  addonId: "pioneer-study-online-news@mozilla.org",
+  studyName: "online-news",
   branches: [
     { name: "control", weight: 1 },
     { name: "treatment", weight: 1 },
@@ -45,26 +45,26 @@ const Config = {
 
   phases: {
     preTreatment: {
-      duration: 5000, // 3 * WEEK,
+      duration: 3 * WEEK,
       next: 'treatment',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-1",
     },
 
     treatment: {
-      duration: 5000, // 3 * WEEK,
+      duration: 3 * WEEK,
       next: 'postTreatment',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-2",
       promptRepeat: 2,
     },
 
     postTreatment: {
-      duration: 5000, // 3 * WEEK,
+      duration: 3 * WEEK,
       next: 'postStudy',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-3",
     },
 
     postStudy: {
-      duration: 5000, // 1 * WEEK,
+      duration: 1 * WEEK,
       surveyOnly: true,
       next: 'studyEnd',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-4",

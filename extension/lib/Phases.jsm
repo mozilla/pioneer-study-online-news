@@ -18,6 +18,9 @@ XPCOMUtils.defineLazyServiceGetter(
 );
 
 XPCOMUtils.defineLazyModuleGetter(
+  this, "PioneerUtils", "resource://pioneer-study-online-news/PioneerUtils.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
   this, "Config", "resource://pioneer-study-online-news/Config.jsm"
 );
 XPCOMUtils.defineLazyModuleGetter(
@@ -76,7 +79,7 @@ this.Phases = {
     }
 
     if (phase.lastPhase) {
-      this.endStudy();
+      PioneerUtils.endStudy();
       return;
     }
 
@@ -112,16 +115,6 @@ this.Phases = {
       }
     } else if (phase.surveyOnly) {
       this.gotoNextPhase();
-    }
-  },
-
-  // TODO this should be from pioneer-utils
-  async endStudy() {
-    let addon = await AddonManager.getAddonByID('pioneer-study-online-news@mozilla.org');
-    if (addon) {
-      addon.uninstall();
-    } else {
-      throw new Error("Could not find self to uninstall");
     }
   },
 };
