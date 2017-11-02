@@ -62,12 +62,8 @@ this.Bootstrap = {
    * not to slow down browser startup.
    */
   async finishStartup() {
-    const domainResponse = await fetch("resource://pioneer-study-online-news/domains.json");
-    const domains = await domainResponse.json();
-    const trackedHosts = domains.map(d => d.domain);
-
     ActiveURIService.startup();
-    DwellTime.startup(trackedHosts);
+    DwellTime.startup();
     Phases.startup();
   },
 

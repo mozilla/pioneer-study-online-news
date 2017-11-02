@@ -5,6 +5,10 @@
 const { interfaces: Ci, utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/Timer.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "NewsStorage",
+  "resource://pioneer-study-online-news/lib/NewsStorage.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
@@ -19,21 +23,20 @@ const ACCEPTED_SCHEMES = new Set(['http', 'https']);
 const IDLE_DELAY_SECONDS = Services.prefs.getIntPref(
   "extensions.pioneer-study-online-news.idleDelaySeconds", 5,
 );
+// Schedule uploads to run on a 3 hour interval
+// Reduce this interval to test the uploads
+const DELAY_TIME = 1000 * 3 * 60 * 60;
 
 this.DwellTime = {
-  trackedHosts: new Set(),
-  dwellTimes: new Map(),
-
   dwellStartTime: null, // Timestamp when the idle state or focused host last changed
-  focusedHost: null, // Host of the currently-focused URI
-  focusedURL: null, // URL of the currently-focused URI
-  userIsIdle: false, // Whether the user is currently idle or not
+  focusedUrl: null, // URL of the currently-focused URI
 
-  startup(trackedHosts) {
-    this.trackedHosts = new Set(trackedHosts);
+  startup() {
     IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
     ActiveURIService.addObserver(this);
     this.onFocusURI(ActiveURIService.focusedURI);
+    NewsStorage.uploadPings();
+    setInterval(NewsStorage.uploadPings.bind(NewsStorage), DELAY_TIME);
   },
 
   shutdown() {
@@ -45,25 +48,22 @@ this.DwellTime = {
    * Called before the idle state or the currently focused URI changes. Logs the
    * dwell time on the previous hostname.
    */
-  logPreviousDwell(now) {
+  logPreviousDwell(idle_tag, now) {
     // dwellStartTime is null on startup
-    // focusedHost is null if the user was looking at a non-browser window
-    // userIsIdle is true if the user was not active
-    // If any of these is the case, we don't log activity.
-    if (!this.dwellStartTime || !this.focusedHost || this.userIsIdle) {
+    // focusedUrl is null if the user was looking at a non-browser window
+    // If this is the case, we don't log activity.
+    if (!this.focusedUrl) {
       return;
     }
 
-    if (this.trackedHosts.has(this.focusedHost)) {
-      let dwellTime = this.dwellTimes.get(this.focusedURL) || 0;
-      dwellTime += (now - this.dwellStartTime);
-      this.dwellTimes.set(this.focusedURL, dwellTime);
-    }
+    let unixTs = Math.round(now/1000);
+    let obj = {url: this.focusedUrl, details: idle_tag, timestamp: unitTs};
+    NewsStorage.put(obj);
   },
 
   onFocusURI(uri) {
     const now = Date.now();
-    this.logPreviousDwell(now);
+    this.logPreviousDwell('onfocus', now);
 
     let host = null;
     let url = null;
@@ -72,26 +72,17 @@ this.DwellTime = {
       url = uri.spec;
     }
 
-    this.dwellStartTime = now;
-    this.focusedHost = host;
-    this.focusedURL = url;
+    this.focusedUrl = url;
   },
 
   onIdle() {
     const now = Date.now();
-    this.logPreviousDwell(now);
-
-    this.dwellStartTime = now;
-    this.userIsIdle = true;
+    this.logPreviousDwell('idle-start', now);
   },
 
   onIdleBack() {
     const now = Date.now();
-    this.logPreviousDwell(now);
-
-    this.dwellStartTime = now;
-    this.userIsIdle = false;
-
+    this.logPreviousDwell('idle-end', now);
   },
 
   observe(subject, topic, data) {

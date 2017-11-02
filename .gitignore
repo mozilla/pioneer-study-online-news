@@ -1,4 +1,5 @@
 .DS_Store
 node_modules/
 dist/
+*.sw?
 pioneer-study-online-news.xpi
