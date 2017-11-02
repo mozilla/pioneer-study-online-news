@@ -9,6 +9,7 @@
   "author": "Mozilla",
   "license": "MPL-2.0",
   "devDependencies": {
-    "mustache": "2.3.0"
+    "mustache": "^2.3.0",
+    "pioneer-utils": "^1.0.5"
   }
 }
