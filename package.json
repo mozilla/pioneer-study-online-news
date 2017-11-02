@@ -10,7 +10,7 @@
   "license": "MPL-2.0",
   "devDependencies": {
     "mustache": "2.3.0",
-    "pioneer-studies-addon-utils": "1.0.1"
+    "pioneer-utils": "1.0.5"
   },
   "dependencies": {}
 }
