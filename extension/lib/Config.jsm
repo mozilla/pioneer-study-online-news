@@ -8,8 +8,7 @@ const EXPORTED_SYMBOLS = ["config"];
 
 const config = {
   pioneer: {
-    studyName: "pioneer-study-online-news",  // this name must match the pipeline schema to be used
-    studyVersion: 1,
+    studyName: "online-news"
   },
   async isEligible() {
     const addon = await AddonManager.getAddonByID("pioneer-opt-in@mozilla.org");
