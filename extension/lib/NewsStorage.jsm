@@ -108,7 +108,6 @@ this.NewsStorage = {
           });
         }, reason => {
         });
-      } else {
       }
     });
 
