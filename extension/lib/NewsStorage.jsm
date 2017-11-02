@@ -102,7 +102,7 @@ this.NewsStorage = {
     this.getAllPings().then(payload => {
       let lastUploadDate = Services.prefs.getCharPref(UPLOAD_DATE_PREF, "");
       if (lastUploadDate !== isonow()) {
-        pioneerUtils.submitEncryptedPing({entries:payload}).then(() => {
+        pioneerUtils.submitEncryptedPing("online-news-log", 1, {entries: payload}).then(() => {
           this.clear().then(() => {
             Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
           });
