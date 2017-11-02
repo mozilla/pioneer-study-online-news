@@ -11,7 +11,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this,
   "config",
-  "resource://pioneer-study-online-news/lib/Config.jsm");
+  "resource://pioneer-study-online-news/Config.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this,
   "IndexedDB",
