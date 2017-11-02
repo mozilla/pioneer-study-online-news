@@ -107,6 +107,8 @@ this.NewsStorage = {
             Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
           });
         }, reason => {
+          // you probably want to add debug logging here if things
+          // stop working.
         });
       }
     });
@@ -126,9 +128,18 @@ this.NewsStorage = {
     // Pings are strictly timestamp ordered.
     getStore(db).delete(ping.timestamp).then(() => {
       getStore(db).add(ping).then(() => {
+        // you probably want to add debug logging here on
+        // success, but importing console.log and Log.jsm don't seem
+        // to work properly.
       }, reason => {
+        // you probably want to add debug logging here if things
+        // stop working.
       });
     }, reason => {
+      // you probably want to add debug logging here if things
+      // stop working.  Note that you still want to read the
+      // console log in the extensions debugger because sometimes -
+      // errors happen without calling the reject function.
     });
   },
 };
