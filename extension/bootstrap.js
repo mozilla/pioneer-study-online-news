@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { interfaces: Ci, utils: Cu } = Components;
+const { utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(['fetch']);
@@ -101,6 +101,10 @@ this.Bootstrap = {
 
       panel.appendChild(embeddedBrowser);
       document.getElementById("mainPopupSet").appendChild(panel);
+
+      embeddedBrowser.messageManager.loadFrameScript(
+        `resource://pioneer-study-online-news/content/doorhanger.js?${Math.random()}`, false);
+      embeddedBrowser.messageManager.sendAsyncMessage("PioneerOnlineNews::load", JSON.stringify({ rating: 0.1234 }));
     }
     const burgerMenu = document.getElementById("PanelUI-menu-button");
     panel.openPopup(burgerMenu, "bottomcenter topright", 0, 0, false, false);

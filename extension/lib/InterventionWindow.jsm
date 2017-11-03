@@ -1,6 +1,7 @@
-const { interfaces: Ci } = Components;
+const { interfaces: Ci, utils: Cu  } = Components;
+Cu.import("resource://gre/modules/Services.jsm");
 
-const PANEL_CSS_URL = 'resource://pioneer-study-online-news/content/panel.css';
+const PANEL_CSS_URI = Services.io.newURI('resource://pioneer-study-online-news/content/panel.css');
 
 const mappedWindows = new WeakMap();
 
@@ -24,12 +25,12 @@ class InterventionWindow {
 
   insertCSS() {
     const utils = this.window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
-    utils.loadSheet(PANEL_CSS_URL, utils.AGENT_SHEET);
+    utils.loadSheet(PANEL_CSS_URI, utils.AGENT_SHEET);
   }
 
   removeCSS() {
     const utils = this.window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
-    utils.removeSheet(PANEL_CSS_URL, utils.AGENT_SHEET);
+    utils.removeSheet(PANEL_CSS_URI, utils.AGENT_SHEET);
   }
 
   startup() {

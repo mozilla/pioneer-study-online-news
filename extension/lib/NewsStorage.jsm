@@ -2,23 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { interfaces: Ci, utils: Cu } = Components;
+const { utils: Cu } = Components;
 
 const UPLOAD_DATE_PREF = "pioneer.study.online.news.upload.date";
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this,
-  "config",
-  "resource://pioneer-study-online-news/Config.jsm");
+XPCOMUtils.defineLazyModuleGetter(
+  this, "Config", "resource://pioneer-study-online-news/Config.jsm"
+);
 
-XPCOMUtils.defineLazyModuleGetter(this,
-  "IndexedDB",
-  "resource://gre/modules/IndexedDB.jsm");
+XPCOMUtils.defineLazyModuleGetter(
+  this, "IndexedDB", "resource://gre/modules/IndexedDB.jsm"
+);
 
-XPCOMUtils.defineLazyModuleGetter(this, "PioneerUtils",
-  "resource://pioneer-study-online-news/PioneerUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(
+  this, "PioneerUtils", "resource://pioneer-study-online-news/PioneerUtils.jsm"
+);
 
 this.EXPORTED_SYMBOLS = ["NewsStorage"];
 
@@ -98,7 +99,7 @@ this.NewsStorage = {
 
   async uploadPings() {
     // upload ping dataset at the most once a day
-    let pioneerUtils = new PioneerUtils(config.pioneer);
+    let pioneerUtils = new PioneerUtils(Config);
     this.getAllPings().then(payload => {
       let lastUploadDate = Services.prefs.getCharPref(UPLOAD_DATE_PREF, "");
       if (lastUploadDate !== isonow()) {
