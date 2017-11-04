@@ -49,13 +49,17 @@ this.Phases = {
     }
   },
 
+  getCurrentPhase() {
+    const state = State.load();
+    return Config.phases[state.phaseName];
+  },
+
   /**
    * Checks current phase and phase change criteria. Called via
    * persistent timer.
    */
   updateStateMachine() {
-    let state = State.load();
-    let phase = Config.phases[state.phaseName];
+    const phase = this.getCurrentPhase();
 
     if (!phase) {
       throw new Error(`Unknown study phase ${state.phaseName}`);
@@ -70,9 +74,8 @@ this.Phases = {
 
   /** Unconditionally goes to the next phase. */
   gotoNextPhase() {
-    let state = State.read();
-    let phase = Config.phases[state.phaseName];
-    state = State.update({ phaseName: phase.next, lastTransition: Date.now() });
+    let phase = this.getCurrentPhase();
+    const state = State.update({ phaseName: phase.next, lastTransition: Date.now() });
     phase = Config.phases[state.phaseName];
     if (!phase) {
       throw new Error(`Unknown next phase ${state.phaseName}`);
@@ -95,8 +98,7 @@ this.Phases = {
     // TODO: show doorhanger instead of opening tab directly
     // TODO: Only show a survey once per ${INTERVAL}.
 
-    const state = State.load();
-    const phase = Config.phases[state.phaseName];
+    const phase = this.getCurrentPhase();
 
     if (!state.promptsRemaining.hasOwnProperty(state.phaseName)) {
       state.promptsRemaining[state.phaseName] = phase.promptRepeat || 3;

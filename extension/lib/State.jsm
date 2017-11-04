@@ -46,4 +46,4 @@ this.State = {
   clear() {
     Services.prefs.clearUserPref(STATE_PREF);
   }
-}
+};

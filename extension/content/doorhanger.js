@@ -24,16 +24,32 @@ self.port.on("PioneerOnlineNews::load", (data) => {
 
 function load(data) {
   document = content.document;
-  console.log(data);
   updateRating(data.rating);
 }
 
 function updateRating(rating) {
-  const biasRatingBar = document.getElementById("online-news-bias-rating");
+  const biasRating = document.getElementById("bias-rating");
   const normalizedRating = Math.abs(Math.round(rating * 10));
+
+  for (let i = 0; i < biasRating.children.length; i++) {
+    biasRating.children[i].setAttribute("class", "");
+  }
 
   for (let i = 1; i <= normalizedRating; i++) {
     const idx = rating > 0 ? 10 + i : 10 - i;
-    biasRatingBar.children[idx].setAttribute("class", "fill");
+    biasRating.children[idx].setAttribute("class", "fill");
   }
+}
+
+function setupButtons() {
+  const agreeButton = document.getElementById("agree-button");
+  const disagreeButton = document.getElementById("disagree-button");
+
+  agreeButton.addEventListener("click", () => {
+    self.emit("PioneerOnlineNews::agree");
+  });
+
+  disagreeButton.addEventListener("click", () => {
+    self.emit("PioneerOnlineNews::disagree");
+  });
 }

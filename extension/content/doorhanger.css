@@ -69,10 +69,10 @@ p {
     background: #b1b1b3;
 }
 
-#online-news-bias-rating > rect {
+#bias-rating > rect {
     fill: rgba(0, 0, 0, 0.2);
 }
 
-#online-news-bias-rating > rect.fill {
+#bias-rating > rect.fill {
     fill: #000;
 }

@@ -22,9 +22,6 @@ XPCOMUtils.defineLazyModuleGetter(
 XPCOMUtils.defineLazyModuleGetter(
   this, "Phases", "resource://pioneer-study-online-news/lib/Phases.jsm"
 );
-XPCOMUtils.defineLazyModuleGetter(
-  this, "InterventionWindow", "resource://pioneer-study-online-news/lib/InterventionWindow.jsm",
-);
 
 const TIMER_NAME = "pioneer-online-news-study-state";
 const REASONS = {
@@ -73,8 +70,6 @@ this.Bootstrap = {
     const windowEnumerator = Services.wm.getEnumerator("navigator:browser");
     while (windowEnumerator.hasMoreElements()) {
       const window = windowEnumerator.getNext();
-      const interventionWindow = new InterventionWindow(window);
-      interventionWindow.startup();
 
       // Show a doorhanger for testing.
       this.doorhangerInterventionTreatment(window);
@@ -104,7 +99,7 @@ this.Bootstrap = {
 
       embeddedBrowser.messageManager.loadFrameScript(
         `resource://pioneer-study-online-news/content/doorhanger.js?${Math.random()}`, false);
-      embeddedBrowser.messageManager.sendAsyncMessage("PioneerOnlineNews::load", JSON.stringify({ rating: 0.1234 }));
+      embeddedBrowser.messageManager.sendAsyncMessage("PioneerOnlineNews::load", { rating: 0.1234 });
     }
     const burgerMenu = document.getElementById("PanelUI-menu-button");
     panel.openPopup(burgerMenu, "bottomcenter topright", 0, 0, false, false);
@@ -125,15 +120,6 @@ this.Bootstrap = {
     DwellTime.shutdown();
     ActiveURIService.shutdown();
     Phases.shutdown();
-
-    const windowEnumerator = Services.wm.getEnumerator("navigator:browser");
-    while (windowEnumerator.hasMoreElements()) {
-      const window = windowEnumerator.getNext();
-      if (InterventionWindow.has(window)) {
-        const browserWindow = InterventionWindow.get(window);
-        browserWindow.shutdown();
-      }
-    }
 
     Cu.unload("resource://pioneer-study-online-news/Config.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/ActiveURIService.jsm");

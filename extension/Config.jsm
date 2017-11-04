@@ -54,6 +54,7 @@ const Config = {
       duration: 3 * WEEK,
       next: 'postTreatment',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-2",
+      analyzeBias: true,
       promptRepeat: 2,
     },
 
