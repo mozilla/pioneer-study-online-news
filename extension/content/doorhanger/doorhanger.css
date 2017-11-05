@@ -9,6 +9,13 @@ p {
     padding: 0 2em;
 }
 
+footer {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+
 .container {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
@@ -42,11 +49,7 @@ p {
 }
 
 .buttons {
-    bottom: 0;
     display: flex;
-    left: 0;
-    position: absolute;
-    width: 100%;
 }
 
 .buttons > button {
@@ -61,6 +64,10 @@ p {
     text-align: center;
 }
 
+.buttons > button:nth-of-type(even) {
+    border: 0;
+}
+
 .buttons > button:hover {
     background: #d7d7db;
 }
@@ -69,10 +76,24 @@ p {
     background: #b1b1b3;
 }
 
+.infobar {
+    background: #363959;
+    color: #fff;
+    font-size: 11px;
+    padding: 0.75em 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.infobar > a,
+.infobar > a:visited {
+    color: #fff;
+}
+
 #bias-rating > rect {
-    fill: rgba(0, 0, 0, 0.2);
+    fill: #d7d7db;
 }
 
 #bias-rating > rect.fill {
-    fill: #000;
+    fill: #38383d;
 }

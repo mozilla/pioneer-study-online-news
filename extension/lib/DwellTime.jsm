@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { interfaces: Ci, utils: Cu } = Components;
+const { utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Timer.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "NewsStorage",
-  "resource://pioneer-study-online-news/lib/NewsStorage.jsm");
-
+  "resource://pioneer-study-online-news/lib/NewsStorage.jsm"
+);
 XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
 );
@@ -57,7 +57,7 @@ this.DwellTime = {
     }
 
     let unixTs = Math.round(now/1000);
-    let obj = {url: this.focusedUrl, details: idle_tag, timestamp: unitTs};
+    let obj = {url: this.focusedUrl, details: idle_tag, timestamp: unixTs};
     NewsStorage.put(obj);
   },
 

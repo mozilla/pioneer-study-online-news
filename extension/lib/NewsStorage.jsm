@@ -4,25 +4,19 @@
 
 const { utils: Cu } = Components;
 
-const UPLOAD_DATE_PREF = "pioneer.study.online.news.upload.date";
-
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
-  this, "Config", "resource://pioneer-study-online-news/Config.jsm"
-);
-
-XPCOMUtils.defineLazyModuleGetter(
   this, "IndexedDB", "resource://gre/modules/IndexedDB.jsm"
 );
-
 XPCOMUtils.defineLazyModuleGetter(
-  this, "PioneerUtils", "resource://pioneer-study-online-news/PioneerUtils.jsm"
+  this, "Pioneer", "resource://pioneer-study-online-news/lib/Pioneer.jsm"
 );
 
 this.EXPORTED_SYMBOLS = ["NewsStorage"];
 
+const UPLOAD_DATE_PREF = "pioneer.study.online.news.upload.date";
 const DB_NAME = "online-news-study";
 const DB_OPTIONS = {
   version: 1,
@@ -73,7 +67,7 @@ function isonow() {
   }
   let d = new Date();
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`;
-};
+}
 
 this.NewsStorage = {
 
@@ -93,17 +87,15 @@ this.NewsStorage = {
 
   async getAllPings() {
     const db = await getDatabase();
-    const allDBPings = await getStore(db).getAll();
-    return allDBPings;
+    return await getStore(db).getAll();
   },
 
   async uploadPings() {
     // upload ping dataset at the most once a day
-    let pioneerUtils = new PioneerUtils(Config);
     this.getAllPings().then(payload => {
       let lastUploadDate = Services.prefs.getCharPref(UPLOAD_DATE_PREF, "");
       if (lastUploadDate !== isonow()) {
-        pioneerUtils.submitEncryptedPing("online-news-log", 1, {entries: payload}).then(() => {
+        Pioneer.utils.submitEncryptedPing("online-news-log", 1, {entries: payload}).then(() => {
           this.clear().then(() => {
             Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
           });

@@ -18,7 +18,7 @@ XPCOMUtils.defineLazyServiceGetter(
 );
 
 XPCOMUtils.defineLazyModuleGetter(
-  this, "PioneerUtils", "resource://pioneer-study-online-news/PioneerUtils.jsm"
+  this, "Pioneer", "resource://pioneer-study-online-news/lib/Pioneer.jsm"
 );
 XPCOMUtils.defineLazyModuleGetter(
   this, "Config", "resource://pioneer-study-online-news/Config.jsm"
@@ -59,6 +59,7 @@ this.Phases = {
    * persistent timer.
    */
   updateStateMachine() {
+    const state = State.load();
     const phase = this.getCurrentPhase();
 
     if (!phase) {
@@ -82,7 +83,7 @@ this.Phases = {
     }
 
     if (phase.lastPhase) {
-      PioneerUtils.endStudy();
+      Pioneer.utils.endStudy();
       return;
     }
 

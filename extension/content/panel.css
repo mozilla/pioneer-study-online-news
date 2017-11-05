@@ -1,8 +1,8 @@
-#online-news-intervention-panel {
+#online-news-bias-panel {
   width: 400px;
-  height: 200px;
+  height: 220px;
 }
 
-.no-padding-panel > .panel-arrowcontainer > .panel-arrowcontent {
+.pioneer-panel > .panel-arrowcontainer > .panel-arrowcontent {
   padding: 0 !important;
 }

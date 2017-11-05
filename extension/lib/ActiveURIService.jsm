@@ -6,10 +6,6 @@ const { interfaces: Ci, utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(
-  this, "InterventionWindow", "resource://pioneer-study-online-news/lib/InterventionWindow.jsm",
-);
-
 this.EXPORTED_SYMBOLS = ["ActiveURIService"];
 
 /**
@@ -45,7 +41,6 @@ this.ActiveURIService = {
     while (windowList.hasMoreElements()) {
       const window = windowList.getNext();
       this.trackWindow(window);
-      this.setupInterventionWindow(window);
     }
 
     // Set the focused URI to the currently-focused URI if possible
@@ -63,7 +58,8 @@ this.ActiveURIService = {
 
     const windowList = Services.wm.getEnumerator(null);
     while (windowList.hasMoreElements()) {
-      this.trackWindow(windowList.getNext());
+      const window = windowList.getNext();
+      this.trackWindow(window);
     }
   },
 
@@ -73,7 +69,6 @@ this.ActiveURIService = {
     // Clean up tracked windows
     for (const domWindow of this.trackedWindows) {
       this.untrackWindow(domWindow);
-      this.teardownInterventionWindow(domWindow);
     }
   },
 
@@ -89,18 +84,6 @@ this.ActiveURIService = {
     this.focusedURI = uri;
     for (const observer of this.observers) {
       observer.observe(this, 'uriFocused', uri);
-    }
-  },
-
-  setupInterventionWindow(domWindow) {
-    const interventionWindow = new InterventionWindow(domWindow);
-    interventionWindow.startup();
-  },
-
-  teardownInterventionWindow(domWindow) {
-    if (InterventionWindow.has(window)) {
-      const browserWindow = InterventionWindow.get(window);
-      browserWindow.shutdown();
     }
   },
 
@@ -156,7 +139,6 @@ this.ActiveURIService = {
     switch (topic) {
       case "xul-window-registered":
         this.onRegisterWindow(getDOMWindow(subject));
-        this.setupInterventionWindow(getDOMWindow(subject));
         break;
       case "xul-window-destroyed":
         this.updateTrackedWindows();

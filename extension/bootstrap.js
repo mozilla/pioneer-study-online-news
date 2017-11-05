@@ -8,9 +8,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(['fetch']);
 
 XPCOMUtils.defineLazyModuleGetter(
-  this, "Config", "resource://pioneer-study-online-news/Config.jsm"
-);
-XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
 );
 XPCOMUtils.defineLazyModuleGetter(
@@ -21,6 +18,12 @@ XPCOMUtils.defineLazyModuleGetter(
 );
 XPCOMUtils.defineLazyModuleGetter(
   this, "Phases", "resource://pioneer-study-online-news/lib/Phases.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
+  this, "Pioneer", "resource://pioneer-study-online-news/lib/Pioneer.jsm"
+);
+XPCOMUtils.defineLazyServiceGetter(
+  this, "StyleSheetService", "@mozilla.org/content/style-sheet-service;1", "nsIStyleSheetService",
 );
 
 const TIMER_NAME = "pioneer-online-news-study-state";
@@ -35,7 +38,7 @@ const REASONS = {
   ADDON_DOWNGRADE:  8, // The add-on is being downgraded.
 };
 const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
-const STATE_PREF = "extensions.pioneer-online-news.state";
+const PANEL_CSS_URI = Services.io.newURI('resource://pioneer-study-online-news/content/panel.css');
 
 
 this.Bootstrap = {
@@ -63,46 +66,18 @@ this.Bootstrap = {
    * not to slow down browser startup.
    */
   async finishStartup() {
+    // Check if the user is opted in to pioneer and if not end the study
+    Pioneer.startup();
+    if (!Pioneer.utils.isUserOptedIn()) {
+      Pioneer.utils.endStudy(Pioneer.utils.EVENTS.INELIGIBLE);
+      return false;
+    }
+
+    StyleSheetService.loadAndRegisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
+
     ActiveURIService.startup();
     DwellTime.startup();
     Phases.startup();
-
-    const windowEnumerator = Services.wm.getEnumerator("navigator:browser");
-    while (windowEnumerator.hasMoreElements()) {
-      const window = windowEnumerator.getNext();
-
-      // Show a doorhanger for testing.
-      this.doorhangerInterventionTreatment(window);
-    }
-  },
-
-  doorhangerInterventionTreatment(browserWindow) {
-    const document = browserWindow.window.document;
-    let panel = document.getElementById("online-news-intervention-panel");
-    if (panel === null) { // create the panel
-      panel = document.createElement("panel");
-      panel.setAttribute("id", "online-news-intervention-panel");
-      panel.setAttribute("class", "no-padding-panel");
-      panel.setAttribute("type", "arrow");
-      panel.setAttribute("noautofocus", true);
-      panel.setAttribute("level", "parent");
-
-      const embeddedBrowser = document.createElement("browser");
-      embeddedBrowser.setAttribute("id", "online-news-intervention-doorhanger");
-      embeddedBrowser.setAttribute("src", "resource://pioneer-study-online-news/content/doorhanger-intervention.html");
-      embeddedBrowser.setAttribute("type", "content");
-      embeddedBrowser.setAttribute("disableglobalhistory", "true");
-      embeddedBrowser.setAttribute("flex", "1");
-
-      panel.appendChild(embeddedBrowser);
-      document.getElementById("mainPopupSet").appendChild(panel);
-
-      embeddedBrowser.messageManager.loadFrameScript(
-        `resource://pioneer-study-online-news/content/doorhanger.js?${Math.random()}`, false);
-      embeddedBrowser.messageManager.sendAsyncMessage("PioneerOnlineNews::load", { rating: 0.1234 });
-    }
-    const burgerMenu = document.getElementById("PanelUI-menu-button");
-    panel.openPopup(burgerMenu, "bottomcenter topright", 0, 0, false, false);
   },
 
   shutdown(data, reason) {
@@ -120,13 +95,19 @@ this.Bootstrap = {
     DwellTime.shutdown();
     ActiveURIService.shutdown();
     Phases.shutdown();
+    
+    if(StyleSheetService.sheetRegistered(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET)) {
+      StyleSheetService.unregisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
+    }
 
     Cu.unload("resource://pioneer-study-online-news/Config.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/Pioneer.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/ActiveURIService.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/DwellTime.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/Phases.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/State.jsm");
-    Cu.unload("resource://pioneer-study-online-news/lib/InterventionWindow.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/Panels.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/BiasDoorhanger.jsm");
   },
 
   uninstall() {},
