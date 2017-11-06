@@ -68,7 +68,7 @@ class BiasDoorhanger {
 
   hideForever() {
     const hostname = Hosts.getHostnameFromURI(this.focusedURI);
-    DoorhangerStorage.put(-1, hostname);
+    DoorhangerStorage.setStats(hostname, true);
     this.hide();
   }
 
@@ -138,7 +138,7 @@ class BiasDoorhanger {
       const shouldShow = !stats.neverAgain && timeSinceShown > Config.showDoorhangerInterval;
 
       if (hostname && isTreatmentPhase && isTracked && shouldShow) {
-        DoorhangerStorage.put(Date.now(), hostname);
+        DoorhangerStorage.setStats(hostname);
         this.show();
       } else {
         this.hide();
