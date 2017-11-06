@@ -1,0 +1,99 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    line-height: 140%;
+    padding: 0 2em;
+}
+
+footer {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.container {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+.bar {
+    margin: 1.5em auto;
+    width: 300px;
+}
+
+.bar svg {
+    height: 20px;
+    width: 300px;
+}
+
+.bar > .legend {
+    display: flex;
+    position: relative;
+    width: 300px;
+}
+
+.bar > .legend > span {
+    flex: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.bar > .legend > span:last-child {
+    text-align: right;
+}
+
+.buttons {
+    display: flex;
+}
+
+.buttons > button {
+    background: #ededf0;
+    border: 0;
+    border-right: 1px solid #b1b1b3;
+    box-sizing: border-box;
+    cursor: pointer;
+    flex: 1;
+    outline: none;
+    padding: 1em;
+    text-align: center;
+}
+
+.buttons > button:nth-of-type(even) {
+    border: 0;
+}
+
+.buttons > button:hover {
+    background: #d7d7db;
+}
+
+.buttons > button:active {
+    background: #b1b1b3;
+}
+
+.infobar {
+    background: #363959;
+    color: #fff;
+    font-size: 11px;
+    padding: 0.75em 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.infobar > a,
+.infobar > a:visited {
+    color: #fff;
+}
+
+#bias-rating > rect {
+    fill: #d7d7db;
+}
+
+#bias-rating > rect.fill {
+    fill: #38383d;
+}

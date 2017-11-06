@@ -26,7 +26,7 @@ this.State = {
   load() {
     const stateJson = Services.prefs.getCharPref(STATE_PREF, "");
     try {
-      return JSON.parse(stateJSON);
+      return JSON.parse(stateJson);
     } catch (err) {
       this.save(DEFAULT_STATE);
       return DEFAULT_STATE;
@@ -46,4 +46,4 @@ this.State = {
   clear() {
     Services.prefs.clearUserPref(STATE_PREF);
   }
-}
+};

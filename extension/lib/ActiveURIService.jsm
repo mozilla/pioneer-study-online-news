@@ -4,6 +4,11 @@
 
 const { interfaces: Ci, utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(
+  this, "BiasDoorhanger", "resource://pioneer-study-online-news/lib/BiasDoorhanger.jsm"
+);
 
 this.EXPORTED_SYMBOLS = ["ActiveURIService"];
 
@@ -38,7 +43,8 @@ this.ActiveURIService = {
     // Register existing windows for tracking
     const windowList = Services.wm.getEnumerator(null);
     while (windowList.hasMoreElements()) {
-      this.trackWindow(windowList.getNext());
+      const window = windowList.getNext();
+      this.setupWindow(window);
     }
 
     // Set the focused URI to the currently-focused URI if possible
@@ -56,7 +62,8 @@ this.ActiveURIService = {
 
     const windowList = Services.wm.getEnumerator(null);
     while (windowList.hasMoreElements()) {
-      this.trackWindow(windowList.getNext());
+      const window = windowList.getNext();
+      this.trackWindow(window);
     }
   },
 
@@ -77,11 +84,21 @@ this.ActiveURIService = {
     this.observers.delete(observer);
   },
 
-  setFocusedURI(uri) {
+  setFocusedURI(domWindow, uri) {
     this.focusedURI = uri;
     for (const observer of this.observers) {
-      observer.observe(this, 'uriFocused', uri);
+      observer.observe(this, 'uriFocused', {
+        window: domWindow,
+        uri
+      });
     }
+  },
+
+  setupWindow(domWindow) {
+    this.trackWindow(domWindow);
+
+    const doorhanger = new BiasDoorhanger(domWindow);
+    this.addObserver(doorhanger);
   },
 
   trackWindow(domWindow) {
@@ -106,29 +123,29 @@ this.ActiveURIService = {
 
   onRegisterWindow(domWindow) {
     domWindow.addEventListener("load", () => {
-      this.trackWindow(domWindow);
+      this.setupWindow(domWindow);
     });
   },
 
   onFocusWindow(domWindow) {
     this.focusedWindow = domWindow;
     if (domWindow.gBrowser) {
-      this.setFocusedURI(domWindow.gBrowser.currentURI);
+      this.setFocusedURI(domWindow, domWindow.gBrowser.currentURI);
     } else {
-      this.setFocusedURI(null);
+      this.setFocusedURI(domWindow, null);
     }
   },
 
   onBlurWindow(domWindow) {
     if (domWindow === this.focusedWindow) {
       this.focusedWindow = null;
-      this.setFocusedURI(null);
+      this.setFocusedURI(domWindow, null);
     }
   },
 
   onLocationChange(domWindow, progress, request, uri) {
     if (domWindow === this.focusedWindow) {
-      this.setFocusedURI(uri);
+      this.setFocusedURI(domWindow, uri);
     }
   },
 

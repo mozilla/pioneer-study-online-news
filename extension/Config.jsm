@@ -15,7 +15,9 @@ const Config = {
     { name: "treatment", weight: 1 },
   ],
 
-  updateTimerInterval: 1000,
+  updateTimerInterval: 1 * DAY,
+  showDoorhangerInterval: 1 * DAY,
+  logSubmissionInterval: 1 * DAY,
 
   /**
    * @typedef {Object} Phase
@@ -39,6 +41,8 @@ const Config = {
    *    phase, regardless of the time spend.
    * @property {boolean?} lastPhase
    *    Optional. If true, upon reaching this state the study will end.
+   * @property {boolean?} treatment
+   *    Optional. If the treatment should be shown during this phase.
    */
 
   firstPhase: 'preTreatment',
@@ -54,6 +58,7 @@ const Config = {
       duration: 3 * WEEK,
       next: 'postTreatment',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-2",
+      treatment: true,
       promptRepeat: 2,
     },
 
