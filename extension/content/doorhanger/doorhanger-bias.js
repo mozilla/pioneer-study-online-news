@@ -19,24 +19,34 @@ const self = {
 };
 
 self.port.on("PioneerOnlineNews::load", data => {
-  content.addEventListener("load", () => load(data));
+  content.addEventListener("load", () => onLoad(data));
 });
 
-function load(data) {
+self.port.on("PioneerOnlineNews::update", data => onUpdate(data));
+
+function onLoad() {
   document = content.document;
-  updateRating(data.rating);
   setupButtons();
+}
+
+function onUpdate(data) {
+  updateRating(data.rating);
 }
 
 function updateRating(rating) {
   const biasRating = document.getElementById("bias-rating");
-  const normalizedRating = Math.abs(Math.round(rating * 10));
+
+  /**
+   * The rating is -2.0 to 2.0 so we multiple by 10 and divide by 2
+   * and then round to get an integer value from -10 to 10.
+   */
+  const normalizedRating = Math.round(rating * 5);
 
   for (let i = 0; i < biasRating.children.length; i++) {
     biasRating.children[i].setAttribute("class", "");
   }
 
-  for (let i = 1; i <= normalizedRating; i++) {
+  for (let i = 1; i <= Math.abs(normalizedRating); i++) {
     const idx = rating > 0 ? 10 + i : 10 - i;
     biasRating.children[idx].setAttribute("class", "fill");
   }

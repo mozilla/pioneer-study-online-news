@@ -7,8 +7,8 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Timer.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "NewsStorage",
-  "resource://pioneer-study-online-news/lib/NewsStorage.jsm"
+XPCOMUtils.defineLazyModuleGetter(
+  this, "LogStorage", "resource://pioneer-study-online-news/lib/LogStorage.jsm"
 );
 XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
@@ -35,8 +35,8 @@ this.DwellTime = {
     IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
     ActiveURIService.addObserver(this);
     this.onFocusURI(ActiveURIService.focusedURI);
-    NewsStorage.uploadPings();
-    setInterval(NewsStorage.uploadPings.bind(NewsStorage), DELAY_TIME);
+    LogStorage.uploadPings();
+    setInterval(LogStorage.uploadPings.bind(LogStorage), DELAY_TIME);
   },
 
   shutdown() {
@@ -58,12 +58,13 @@ this.DwellTime = {
 
     let unixTs = Math.round(now/1000);
     let obj = {url: this.focusedUrl, details: idle_tag, timestamp: unixTs};
-    NewsStorage.put(obj);
+    LogStorage.put(obj);
   },
 
-  onFocusURI(uri) {
+  onFocusURI(data) {
+    const uri = data.uri;
     const now = Date.now();
-    this.logPreviousDwell('onfocus', now);
+    this.logPreviousDwell('focus-end', now);
 
     let host = null;
     let url = null;
@@ -73,6 +74,7 @@ this.DwellTime = {
     }
 
     this.focusedUrl = url;
+    this.logPreviousDwell('focus-start', now);
   },
 
   onIdle() {

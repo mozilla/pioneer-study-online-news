@@ -4,10 +4,24 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(
   this, "Panels", "resource://pioneer-study-online-news/lib/Panels.jsm",
 );
+XPCOMUtils.defineLazyModuleGetter(
+  this, "Hosts", "resource://pioneer-study-online-news/lib/Hosts.jsm",
+);
+XPCOMUtils.defineLazyModuleGetter(
+  this, "Phases", "resource://pioneer-study-online-news/lib/Phases.jsm",
+);
+XPCOMUtils.defineLazyModuleGetter(
+  this, "Pioneer", "resource://pioneer-study-online-news/lib/Pioneer.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
+  this, "CommonStorage", "resource://pioneer-study-online-news/lib/CommonStorage.jsm"
+);
 
 const DOORHANGER_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-bias.html";
-const FRAME_SCRIPT_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger.js";
+const FRAME_SCRIPT_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-bias.js";
 const LEARN_MORE_URL = "chrome://pioneer-study-online-news/content/learn-more.html";
+
+const TIME_BEFORE_RESHOWN = 10000; //24 * 60 * 60 * 1000;
 
 const MESSAGES = {
   AGREE: "PioneerOnlineNews::agree",
@@ -16,16 +30,12 @@ const MESSAGES = {
   LEARN_MORE: "PioneerOnlineNews::learn-more",
 };
 
-const mappedWindows = new WeakMap();
-
 
 class BiasDoorhanger {
   constructor(browserWindow) {
     this.browserWindow = browserWindow;
     this.panel = Panels.create(browserWindow, "online-news-bias-panel", DOORHANGER_URL);
     this.panelBrowser = Panels.getEmbeddedBrowser(this.panel);
-
-    BiasDoorhanger.set(browserWindow, this);
 
     const mm = this.panelBrowser.messageManager;
     const self = this;
@@ -35,19 +45,7 @@ class BiasDoorhanger {
     });
 
     mm.loadFrameScript(`${FRAME_SCRIPT_URL}?${Math.random()}`, false);
-    mm.sendAsyncMessage("PioneerOnlineNews::load", { rating: 0.1234 });
-  }
-
-  static has(key) {
-    return mappedWindows.has(key);
-  }
-
-  static get(key) {
-    return mappedWindows.get(key);
-  }
-
-  static set(key, value) {
-    return mappedWindows.set(key, value)
+    mm.sendAsyncMessage("PioneerOnlineNews::load", {});
   }
 
   show(anchor) {
@@ -55,11 +53,22 @@ class BiasDoorhanger {
     if (!anchor) {
       anchor = document.getElementById("PanelUI-menu-button"); // Hamburger menu button
     }
+    this.panelBrowser.messageManager.sendAsyncMessage("PioneerOnlineNews::update", {
+      rating: Hosts.getRatingForURI(this.focusedURI)
+    });
     this.panel.openPopup(anchor, "bottomcenter topright", 0, 0, false, false);
   }
 
   hide() {
-    this.panel.hidePopup();
+    if (this.panel && this.panel.hidePopup) {
+      this.panel.hidePopup();
+    }
+  }
+
+  hideForever() {
+    const hostname = Hosts.getHostnameFromURI(this.focusedURI);
+    CommonStorage.put(-1, hostname);
+    this.hide();
   }
 
   showLearnMore() {
@@ -68,13 +77,84 @@ class BiasDoorhanger {
     this.hide();
   }
 
+  logInteraction(details) {
+    const entry = {
+      url: this.focusedURI.spec,
+      timestamp: Math.round(Date.now()/1000),
+      details,
+    };
+    Pioneer.utils.submitEncryptedPing("online-news-log", 1, {entries: [entry]})
+  }
+
+  onAgree() {
+    this.logInteraction("agree");
+    this.hideForever()
+  }
+
+  onDisagree() {
+    this.logInteraction("disagree");
+    this.hideForever();
+  }
+
+  onDismiss() {
+    this.logInteraction("dismiss");
+    this.hideForever();
+  }
+
   receiveMessage(message) {
     switch (message.name) {
       case MESSAGES.LEARN_MORE:
         this.showLearnMore();
         break;
 
+      case MESSAGES.AGREE:
+        this.onAgree();
+        break;
+
+      case MESSAGES.DISAGREE:
+        this.onDisagree();
+        break;
+
+      case MESSAGES.DISMISS:
+        this.onDismiss();
+        break;
+
       default:
+        break;
+    }
+  }
+
+  async onFocusURI(data) {
+    if (data.window === this.browserWindow && data.uri) {
+      this.focusedURI = data.uri;
+
+      const isTracked = Hosts.isTrackedURI(data.uri);
+      const hostname = Hosts.getHostnameFromURI(data.uri);
+      const isTreatmentPhase = Phases.getCurrentPhase().treatment;
+
+      let lastShown = 0;
+      if (hostname) {
+        lastShown = await CommonStorage.get(hostname) || 0;
+      }
+
+      let timeSinceShown = 0;
+      if (lastShown >= 0) {
+        timeSinceShown = Date.now() - lastShown;
+      }
+
+      if (hostname && isTreatmentPhase && isTracked && timeSinceShown > TIME_BEFORE_RESHOWN) {
+        CommonStorage.put(Date.now(), hostname);
+        this.show();
+      } else {
+        this.hide();
+      }
+    }
+  }
+
+  observe(subject, topic, data) {
+    switch (topic) {
+      case "uriFocused":
+        this.onFocusURI(data);
         break;
     }
   }

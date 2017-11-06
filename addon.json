@@ -1,6 +1,6 @@
 {
   "addon": {
-    "version": "1.0.1",
+    "version": "1.0.0",
     "id": "pioneer-study-online-news@mozilla.org",
     "name": "Pioneer Online News Study",
     "minVersion": "55.0",

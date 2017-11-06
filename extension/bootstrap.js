@@ -5,7 +5,6 @@
 const { utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.importGlobalProperties(['fetch']);
 
 XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
@@ -21,6 +20,12 @@ XPCOMUtils.defineLazyModuleGetter(
 );
 XPCOMUtils.defineLazyModuleGetter(
   this, "Pioneer", "resource://pioneer-study-online-news/lib/Pioneer.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
+  this, "Hosts", "resource://pioneer-study-online-news/lib/Hosts.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
+  this, "NewsIndexedDB", "resource://pioneer-study-online-news/lib/NewsIndexedDB.jsm"
 );
 XPCOMUtils.defineLazyServiceGetter(
   this, "StyleSheetService", "@mozilla.org/content/style-sheet-service;1", "nsIStyleSheetService",
@@ -75,6 +80,8 @@ this.Bootstrap = {
 
     StyleSheetService.loadAndRegisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
 
+    await NewsIndexedDB.startup();
+    Hosts.startup();
     ActiveURIService.startup();
     DwellTime.startup();
     Phases.startup();
@@ -95,6 +102,7 @@ this.Bootstrap = {
     DwellTime.shutdown();
     ActiveURIService.shutdown();
     Phases.shutdown();
+    NewsIndexedDB.shutdown();
     
     if(StyleSheetService.sheetRegistered(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET)) {
       StyleSheetService.unregisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
@@ -104,9 +112,13 @@ this.Bootstrap = {
     Cu.unload("resource://pioneer-study-online-news/lib/Pioneer.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/ActiveURIService.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/DwellTime.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/NewsIndexedDB.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/CommonStorage.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/LogStorage.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/Phases.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/State.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/Panels.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/Hosts.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/BiasDoorhanger.jsm");
   },
 
