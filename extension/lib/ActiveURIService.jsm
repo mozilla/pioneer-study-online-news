@@ -63,7 +63,9 @@ this.ActiveURIService = {
     const windowList = Services.wm.getEnumerator(null);
     while (windowList.hasMoreElements()) {
       const window = windowList.getNext();
-      this.trackWindow(window);
+      if (!this.isWindowPrivate(window)) {
+        this.trackWindow(window);
+      }
     }
   },
 
@@ -95,10 +97,19 @@ this.ActiveURIService = {
   },
 
   setupWindow(domWindow) {
-    this.trackWindow(domWindow);
+    if (!this.isWindowPrivate(domWindow)) {
+      this.trackWindow(domWindow);
 
-    const doorhanger = new BiasDoorhanger(domWindow);
-    this.addObserver(doorhanger);
+      const doorhanger = new BiasDoorhanger(domWindow);
+      this.addObserver(doorhanger);
+    }
+  },
+
+  isWindowPrivate(domWindow) {
+    const privacyContext = domWindow.QueryInterface(Ci.nsIInterfaceRequestor)
+                                    .getInterface(Ci.nsIWebNavigation)
+                                    .QueryInterface(Ci.nsILoadContext);
+    return privacyContext.usePrivateBrowsing;
   },
 
   trackWindow(domWindow) {
