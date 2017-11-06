@@ -99,6 +99,7 @@ this.Phases = {
     // TODO: show doorhanger instead of opening tab directly
     // TODO: Only show a survey once per ${INTERVAL}.
 
+    const state = State.load();
     const phase = this.getCurrentPhase();
 
     if (!state.promptsRemaining.hasOwnProperty(state.phaseName)) {
