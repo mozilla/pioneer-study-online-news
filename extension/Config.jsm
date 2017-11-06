@@ -12,7 +12,7 @@ const Config = {
   studyName: "online-news",
   branches: [
     { name: "control", weight: 1 },
-    { name: "treatment", weight: 1 },
+    { name: "treatment", weight: 1, showDoorhanger: true },
   ],
 
   updateTimerInterval: 1 * DAY,

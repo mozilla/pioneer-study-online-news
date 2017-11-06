@@ -137,7 +137,9 @@ class BiasDoorhanger {
       const timeSinceShown = Date.now() - stats.timestamp;
       const shouldShow = !stats.neverAgain && timeSinceShown > Config.showDoorhangerInterval;
 
-      if (hostname && isTreatmentPhase && isTracked && shouldShow) {
+      const inTreatmentBranch = Pioneer.utils.chooseBranch().showDoorhanger;
+
+      if (hostname && isTreatmentPhase && isTracked && shouldShow && inTreatmentBranch) {
         DoorhangerStorage.setStats(hostname);
         this.show();
       } else {

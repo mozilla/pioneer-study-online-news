@@ -51,6 +51,7 @@ function updateRating(data) {
 function setupButtons() {
   const agreeButton = document.getElementById("agree-button");
   const disagreeButton = document.getElementById("disagree-button");
+  const closeButton = document.getElementById("close-button");
   const learnMoreLink = document.getElementById("learn-more-link");
 
   agreeButton.addEventListener("click", () => {
@@ -59,6 +60,10 @@ function setupButtons() {
 
   disagreeButton.addEventListener("click", () => {
     port.emit("PioneerOnlineNews::disagree");
+  });
+
+  closeButton.addEventListener("click", () => {
+    port.emit("PioneerOnlineNews::dismiss");
   });
 
   learnMoreLink.addEventListener("click", ev => {
