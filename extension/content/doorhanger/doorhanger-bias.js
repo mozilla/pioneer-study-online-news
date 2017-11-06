@@ -21,7 +21,7 @@ port.on("PioneerOnlineNews::load", data => {
   content.addEventListener("load", () => load(data));
 });
 
-port.on("PioneerOnlineNews::update", data => updateUpdate(data));
+port.on("PioneerOnlineNews::update", data => updateRating(data));
 
 function load() {
   document = content.document;
