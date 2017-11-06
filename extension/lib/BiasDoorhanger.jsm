@@ -1,4 +1,5 @@
 const { utils: Cu } = Components;
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
@@ -23,6 +24,7 @@ XPCOMUtils.defineLazyModuleGetter(
 const DOORHANGER_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-bias.html";
 const FRAME_SCRIPT_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-bias.js";
 const LEARN_MORE_URL = "chrome://pioneer-study-online-news/content/learn-more.html";
+const STUDY_BRANCH_PREF = "extensions.pioneer-online-news.studyBranch";
 
 const MESSAGES = {
   AGREE: "PioneerOnlineNews::agree",
@@ -137,7 +139,13 @@ class BiasDoorhanger {
       const timeSinceShown = Date.now() - stats.timestamp;
       const shouldShow = !stats.neverAgain && timeSinceShown > Config.showDoorhangerInterval;
 
-      const inTreatmentBranch = Pioneer.utils.chooseBranch().showDoorhanger;
+      const branchName = Services.prefs.getCharPref(STUDY_BRANCH_PREF, "");
+      let branch = Config.branches.find(b => b.name === branchName);
+      if (!branch) {
+        branch = await Pioneer.utils.chooseBranch();
+        Services.prefs.setCharPref(STUDY_BRANCH_PREF, branch.name);
+      }
+      const inTreatmentBranch = branch.showDoorhanger;
 
       if (hostname && isTreatmentPhase && isTracked && shouldShow && inTreatmentBranch) {
         DoorhangerStorage.setStats(hostname);

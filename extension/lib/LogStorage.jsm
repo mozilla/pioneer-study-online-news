@@ -19,7 +19,7 @@ XPCOMUtils.defineLazyModuleGetter(
 
 this.EXPORTED_SYMBOLS = ["LogStorage"];
 
-const UPLOAD_DATE_PREF = "pioneer.study.online.news.upload.date";
+const UPLOAD_DATE_PREF = "extensions.pioneer-online-news.lastLogUploadDate";
 
 
 this.LogStorage = {
