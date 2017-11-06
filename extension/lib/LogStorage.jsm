@@ -8,7 +8,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
-  this, "Config", "resource://pioneer-study-online-news/lib/Config.jsm"
+  this, "Config", "resource://pioneer-study-online-news/Config.jsm"
 );
 XPCOMUtils.defineLazyModuleGetter(
   this, "NewsIndexedDB", "resource://pioneer-study-online-news/lib/NewsIndexedDB.jsm"
