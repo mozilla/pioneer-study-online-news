@@ -2,6 +2,9 @@ const { utils: Cu } = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
+  this, "Config", "resource://pioneer-study-online-news/Config.jsm",
+);
+XPCOMUtils.defineLazyModuleGetter(
   this, "Panels", "resource://pioneer-study-online-news/lib/Panels.jsm",
 );
 XPCOMUtils.defineLazyModuleGetter(
@@ -20,8 +23,6 @@ XPCOMUtils.defineLazyModuleGetter(
 const DOORHANGER_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-bias.html";
 const FRAME_SCRIPT_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-bias.js";
 const LEARN_MORE_URL = "chrome://pioneer-study-online-news/content/learn-more.html";
-
-const TIME_BEFORE_RESHOWN = 10000; //24 * 60 * 60 * 1000;
 
 const MESSAGES = {
   AGREE: "PioneerOnlineNews::agree",
@@ -142,7 +143,9 @@ class BiasDoorhanger {
         timeSinceShown = Date.now() - lastShown;
       }
 
-      if (hostname && isTreatmentPhase && isTracked && timeSinceShown > TIME_BEFORE_RESHOWN) {
+      const shouldShow = timeSinceShown > Config.showDoorhangerInterval;
+
+      if (hostname && isTreatmentPhase && isTracked && shouldShow) {
         CommonStorage.put(Date.now(), hostname);
         this.show();
       } else {

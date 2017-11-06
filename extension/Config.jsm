@@ -15,7 +15,8 @@ const Config = {
     { name: "treatment", weight: 1 },
   ],
 
-  updateTimerInterval: 1000,
+  updateTimerInterval: 1 * DAY,
+  showDoorhangerInterval: 1 * DAY,
 
   /**
    * @typedef {Object} Phase
