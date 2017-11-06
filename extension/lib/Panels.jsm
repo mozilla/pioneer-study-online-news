@@ -28,10 +28,6 @@ const Panels = {
     return panel;
   },
 
-  shutdown() {
-
-  },
-
   getPanel(browserWindow, id) {
     const document = browserWindow.window.document;
     return document.getElementById(id);
