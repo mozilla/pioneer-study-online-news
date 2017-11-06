@@ -59,6 +59,7 @@ footer {
     box-sizing: border-box;
     cursor: pointer;
     flex: 1;
+    font-size: 14px;
     outline: none;
     padding: 1em;
     text-align: center;
