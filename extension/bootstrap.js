@@ -113,7 +113,7 @@ this.Bootstrap = {
     Cu.unload("resource://pioneer-study-online-news/lib/ActiveURIService.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/DwellTime.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/NewsIndexedDB.jsm");
-    Cu.unload("resource://pioneer-study-online-news/lib/CommonStorage.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/DoorhangerStorage.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/LogStorage.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/Phases.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/State.jsm");

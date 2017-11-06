@@ -17,6 +17,7 @@ const Config = {
 
   updateTimerInterval: 1 * DAY,
   showDoorhangerInterval: 1 * DAY,
+  logSubmissionInterval: 1 * DAY,
 
   /**
    * @typedef {Object} Phase
@@ -40,6 +41,8 @@ const Config = {
    *    phase, regardless of the time spend.
    * @property {boolean?} lastPhase
    *    Optional. If true, upon reaching this state the study will end.
+   * @property {boolean?} treatment
+   *    Optional. If the treatment should be shown during this phase.
    */
 
   firstPhase: 'preTreatment',

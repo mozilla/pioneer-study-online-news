@@ -24,22 +24,16 @@ const DB_OPTIONS = {
 
 const NewsIndexedDB = {
   async startup() {
-    const dbPromise = new Promise(resolve => {
-      IndexedDB.open(DB_NAME, DB_OPTIONS, db => {
-        db.createObjectStore("log", {
-          keyPath: "timestamp",
-          autoIncrement: false,
-        });
+    this.db = await IndexedDB.open(DB_NAME, DB_OPTIONS, iDB => {
+      iDB.createObjectStore("log", {
+        keyPath: "timestamp",
+        autoIncrement: false,
+      });
 
-        db.createObjectStore("common", {
-          autoIncrement: false,
-        });
-
-        resolve(db);
+      iDB.createObjectStore("doorhanger", {
+        autoIncrement: false,
       });
     });
-
-    this.db = await dbPromise;
   },
 
   shutdown() {

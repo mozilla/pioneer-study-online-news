@@ -2,48 +2,44 @@
 
 let document;
 
-const self = {
-  port: {
-    on(header, handle) {
-      addMessageListener(header, {
-        receiveMessage(message) {
-          if (message.name === header)
-            handle(message.data);
-        },
-      });
-    },
-    emit(header, data) {
-      sendAsyncMessage(header, data);
-    },
+const port = {
+  on(header, handle) {
+    addMessageListener(header, {
+      receiveMessage(message) {
+        if (message.name === header) {
+          handle(message.data);
+        }
+      },
+    });
+  },
+  emit(header, data) {
+    sendAsyncMessage(header, data);
   },
 };
 
-self.port.on("PioneerOnlineNews::load", data => {
-  content.addEventListener("load", () => onLoad(data));
+port.on("PioneerOnlineNews::load", data => {
+  content.addEventListener("load", () => load(data));
 });
 
-self.port.on("PioneerOnlineNews::update", data => onUpdate(data));
+port.on("PioneerOnlineNews::update", data => updateUpdate(data));
 
-function onLoad() {
+function load() {
   document = content.document;
   setupButtons();
 }
 
-function onUpdate(data) {
-  updateRating(data.rating);
-}
-
-function updateRating(rating) {
+function updateRating(data) {
+  const rating = data.rating;
   const biasRating = document.getElementById("bias-rating");
 
   /**
    * The rating is -2.0 to 2.0 so we multiple by 10 and divide by 2
    * and then round to get an integer value from -10 to 10.
    */
-  const normalizedRating = Math.round(rating * 5);
+  const normalizedRating = Math.round(rating * 10 / 2);
 
-  for (let i = 0; i < biasRating.children.length; i++) {
-    biasRating.children[i].setAttribute("class", "");
+  for (const child of biasRating.children) {
+    child.setAttribute("class", "");
   }
 
   for (let i = 1; i <= Math.abs(normalizedRating); i++) {
@@ -58,15 +54,15 @@ function setupButtons() {
   const learnMoreLink = document.getElementById("learn-more-link");
 
   agreeButton.addEventListener("click", () => {
-    self.port.emit("PioneerOnlineNews::agree");
+    port.emit("PioneerOnlineNews::agree");
   });
 
   disagreeButton.addEventListener("click", () => {
-    self.port.emit("PioneerOnlineNews::disagree");
+    port.emit("PioneerOnlineNews::disagree");
   });
 
   learnMoreLink.addEventListener("click", ev => {
     ev.preventDefault();
-    self.port.emit("PioneerOnlineNews::learn-more");
+    port.emit("PioneerOnlineNews::learn-more");
   });
 }

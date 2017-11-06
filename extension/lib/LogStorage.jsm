@@ -8,6 +8,9 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
+  this, "Config", "resource://pioneer-study-online-news/lib/Config.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
   this, "NewsIndexedDB", "resource://pioneer-study-online-news/lib/NewsIndexedDB.jsm"
 );
 XPCOMUtils.defineLazyModuleGetter(
@@ -18,17 +21,6 @@ this.EXPORTED_SYMBOLS = ["LogStorage"];
 
 const UPLOAD_DATE_PREF = "pioneer.study.online.news.upload.date";
 
-
-function isonow() {
-  function pad(number) {
-    if (number < 10) {
-      return '0' + number;
-    }
-    return number;
-  }
-  let d = new Date();
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`;
-}
 
 this.LogStorage = {
   getStore() {
@@ -45,19 +37,15 @@ this.LogStorage = {
 
   async uploadPings() {
     // upload ping dataset at the most once a day
-    this.getAll().then(payload => {
-      let lastUploadDate = Services.prefs.getCharPref(UPLOAD_DATE_PREF, "");
-      if (lastUploadDate !== isonow()) {
-        Pioneer.utils.submitEncryptedPing("online-news-log", 1, {entries: payload}).then(() => {
-          this.clear().then(() => {
-            Services.prefs.setCharPref(UPLOAD_DATE_PREF, isonow());
-          });
-        }, reason => {
-          // you probably want to add debug logging here if things
-          // stop working.
-        });
-      }
-    });
+    const payload = await this.getAll();
+    const lastUploadDate = Services.prefs.getIntPref(UPLOAD_DATE_PREF, 0);
+    const timesinceLastUpload = Date.now() - lastUploadDate;
+
+    if (timesinceLastUpload > Config.logSubmissionInterval) {
+      await Pioneer.utils.submitEncryptedPing("online-news-log", 1, { entries: payload });
+      await this.clear();
+      Services.prefs.setIntPref(UPLOAD_DATE_PREF, Date.now());
+    }
   },
 
   async put(ping) {

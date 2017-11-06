@@ -17,7 +17,7 @@ XPCOMUtils.defineLazyModuleGetter(
   this, "Pioneer", "resource://pioneer-study-online-news/lib/Pioneer.jsm"
 );
 XPCOMUtils.defineLazyModuleGetter(
-  this, "CommonStorage", "resource://pioneer-study-online-news/lib/CommonStorage.jsm"
+  this, "DoorhangerStorage", "resource://pioneer-study-online-news/lib/DoorhangerStorage.jsm"
 );
 
 const DOORHANGER_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-bias.html";
@@ -68,7 +68,7 @@ class BiasDoorhanger {
 
   hideForever() {
     const hostname = Hosts.getHostnameFromURI(this.focusedURI);
-    CommonStorage.put(-1, hostname);
+    DoorhangerStorage.put(-1, hostname);
     this.hide();
   }
 
@@ -133,20 +133,12 @@ class BiasDoorhanger {
       const hostname = Hosts.getHostnameFromURI(data.uri);
       const isTreatmentPhase = Phases.getCurrentPhase().treatment;
 
-      let lastShown = 0;
-      if (hostname) {
-        lastShown = await CommonStorage.get(hostname) || 0;
-      }
-
-      let timeSinceShown = 0;
-      if (lastShown >= 0) {
-        timeSinceShown = Date.now() - lastShown;
-      }
-
-      const shouldShow = timeSinceShown > Config.showDoorhangerInterval;
+      const stats = await DoorhangerStorage.getStats(hostname);
+      const timeSinceShown = Date.now() - stats.timestamp;
+      const shouldShow = !stats.neverAgain && timeSinceShown > Config.showDoorhangerInterval;
 
       if (hostname && isTreatmentPhase && isTracked && shouldShow) {
-        CommonStorage.put(Date.now(), hostname);
+        DoorhangerStorage.put(Date.now(), hostname);
         this.show();
       } else {
         this.hide();

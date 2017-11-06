@@ -29,6 +29,9 @@ XPCOMUtils.defineLazyModuleGetter(
 
 this.EXPORTED_SYMBOLS = ["Phases"];
 
+const TIMER_NAME = "pioneer-online-news-phases-timer";
+
+
 this.Phases = {
   updateStateMachineInterval: null,
 
