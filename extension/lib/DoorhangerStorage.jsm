@@ -32,6 +32,10 @@ this.DoorhangerStorage = {
       timestamp: Date.now(),
       neverAgain: !!neverAgain,
     };
-    this.getStore().put(data, hostname);
+    return await this.getStore().put(data, hostname);
   },
+
+  async unsetStats(hostname) {
+    return await this.getStore().delete(hostname);
+  }
 };

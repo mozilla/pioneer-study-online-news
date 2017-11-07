@@ -7,6 +7,9 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
+  this, "Config", "resource://pioneer-study-online-news/Config.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
 );
 XPCOMUtils.defineLazyModuleGetter(
@@ -31,7 +34,6 @@ XPCOMUtils.defineLazyServiceGetter(
   this, "StyleSheetService", "@mozilla.org/content/style-sheet-service;1", "nsIStyleSheetService",
 );
 
-const TIMER_NAME = "pioneer-online-news-study-state";
 const REASONS = {
   APP_STARTUP:      1, // The application is starting up.
   APP_SHUTDOWN:     2, // The application is shutting down.
@@ -44,12 +46,37 @@ const REASONS = {
 };
 const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
 const PANEL_CSS_URI = Services.io.newURI('resource://pioneer-study-online-news/content/panel.css');
-
+const EXPIRATION_DATE_PREF = "extensions.pioneer-online-news.expirationDateString";
 
 this.Bootstrap = {
   install() {},
 
-  startup(data, reason) {
+  async startup(data, reason) {
+    // Check if the user is opted in to pioneer and if not end the study
+    Pioneer.startup();
+    const events = Pioneer.utils.getAvailableEvents();
+
+    const isEligible = await Pioneer.utils.isUserOptedIn();
+    if (!isEligible) {
+      Pioneer.utils.endStudy(events.INELIGIBLE);
+      return;
+    }
+
+    // Always set EXPIRATION_DATE_PREF if it not set, even if outside of install.
+    // This is a failsafe if opt-out expiration doesn't work, so should be resilient.
+    if (!Services.prefs.prefHasUserValue(EXPIRATION_DATE_PREF)) {
+      const phases = Object.values(Config.phases);
+      const studyLength = phases.map(p => p.duration || 0).reduce((a, b) => a + b);
+      Services.prefs.setIntPref(EXPIRATION_DATE_PREF, Date.now() + studyLength);
+    }
+
+    // Check if the study has expired
+    const expirationDate = Services.prefs.getIntPref(EXPIRATION_DATE_PREF);
+    if (Date.now() > expirationDate) {
+      Pioneer.utils.endStudy(events.EXPIRED);
+      return;
+    }
+
     // If the app is starting up, wait until the UI is available before finishing
     // init.
     if (reason === REASONS.APP_STARTUP) {
@@ -71,14 +98,6 @@ this.Bootstrap = {
    * not to slow down browser startup.
    */
   async finishStartup() {
-    // Check if the user is opted in to pioneer and if not end the study
-    const events = Pioneer.utils.getAvailableEvents();
-    Pioneer.startup();
-    if (!Pioneer.utils.isUserOptedIn()) {
-      Pioneer.utils.endStudy(events.INELIGIBLE);
-      return false;
-    }
-
     StyleSheetService.loadAndRegisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
 
     await NewsIndexedDB.startup();
@@ -121,6 +140,7 @@ this.Bootstrap = {
     Cu.unload("resource://pioneer-study-online-news/lib/Panels.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/Hosts.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/BiasDoorhanger.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/SurveyDoorhanger.jsm");
   },
 
   uninstall() {},

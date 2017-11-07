@@ -76,10 +76,16 @@ class BiasDoorhanger {
     this.hide();
   }
 
-  showLearnMore() {
+  async showLearnMore() {
+    const hostname = Hosts.getHostnameFromURI(this.focusedURI);
+
     const browser = this.browserWindow.gBrowser;
     browser.selectedTab = browser.addTab(LEARN_MORE_URL);
     this.hide();
+
+    // Unset the last shown timestamp so that the doorhanger shows again
+    // when returning to the original tab.
+    await DoorhangerStorage.unsetStats(hostname);
   }
 
   logInteraction(details) {

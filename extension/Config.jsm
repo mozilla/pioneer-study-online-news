@@ -1,7 +1,17 @@
 const { utils: Cu } = Components;
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 const EXPORTED_SYMBOLS = ["Config"];
+
+const TELEMETRY_ENV_PREF = "extensions.pioneer-online-news.telemetryEnv";
+const UPDATE_TIMER_PREF = "extensions.pioneer-online-news.updateTimerInterval";
+const DOORHANGER_INTERVAL_PREF = "extensions.pioneer-online-news.showDoorhangerInterval";
+const LOG_INTERVAL_PREF = "extensions.pioneer-online-news.logSubmissionInterval";
+const PRETREATMENT_DURATION_PREF = "extensions.pioneer-online-news.preTreatmentDuration";
+const TREATMENT_DURATION_PREF = "extensions.pioneer-online-news.treatmentDuration";
+const POSTTREATMENT_DURATION_PREF = "extensions.pioneer-online-news.postTreatmentDuration";
+const POSTSTUDY_DURATION_PREF = "extensions.pioneer-online-news.postStudyDuration";
 
 const HOUR = 1000 * 60 * 60;
 const DAY = 24 * HOUR;
@@ -14,10 +24,11 @@ const Config = {
     { name: "control", weight: 1 },
     { name: "treatment", weight: 1, showDoorhanger: true },
   ],
+  telemetryEnv: Services.prefs.getCharPref(TELEMETRY_ENV_PREF, "prod"),
 
-  updateTimerInterval: 1 * DAY,
-  showDoorhangerInterval: 1 * DAY,
-  logSubmissionInterval: 1 * DAY,
+  updateTimerInterval: Services.prefs.getIntPref(UPDATE_TIMER_PREF, 1 * DAY),
+  showDoorhangerInterval: Services.prefs.getIntPref(DOORHANGER_INTERVAL_PREF, 1 * DAY),
+  logSubmissionInterval: Services.prefs.getIntPref(LOG_INTERVAL_PREF, 1 * DAY),
 
   /**
    * @typedef {Object} Phase
@@ -49,13 +60,13 @@ const Config = {
 
   phases: {
     preTreatment: {
-      duration: 3 * WEEK,
+      duration: Services.prefs.getIntPref(PRETREATMENT_DURATION_PREF, 3 * WEEK),
       next: 'treatment',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-1",
     },
 
     treatment: {
-      duration: 3 * WEEK,
+      duration: Services.prefs.getIntPref(TREATMENT_DURATION_PREF, 3 * WEEK),
       next: 'postTreatment',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-2",
       treatment: true,
@@ -63,13 +74,13 @@ const Config = {
     },
 
     postTreatment: {
-      duration: 3 * WEEK,
+      duration: Services.prefs.getIntPref(POSTTREATMENT_DURATION_PREF, 3 * WEEK),
       next: 'postStudy',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-3",
     },
 
     postStudy: {
-      duration: 1 * WEEK,
+      duration: Services.prefs.getIntPref(POSTSTUDY_DURATION_PREF, 1 * WEEK),
       surveyOnly: true,
       next: 'studyEnd',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-4",

@@ -19,6 +19,7 @@ XPCOMUtils.defineLazyGetter(this, "DEFAULT_STATE", () => {
     phaseName: Config.firstPhase,
     lastTransition: Date.now(),
     promptsRemaining: {},
+    lastSurveyShown: {},
   };
 });
 

@@ -42,9 +42,15 @@ function updateRating(data) {
     child.setAttribute("class", "");
   }
 
-  for (let i = 1; i <= Math.abs(normalizedRating); i++) {
-    const idx = rating > 0 ? 10 + i : 10 - i;
-    biasRating.children[idx].setAttribute("class", "fill");
+  if (normalizedRating === 0) {
+    // Highlight the two boxes on either side of the center line
+    biasRating.children[10 - 1].setAttribute("class", "fill");
+    biasRating.children[10 + 1].setAttribute("class", "fill");
+  } else {
+    for (let i = 1; i <= Math.abs(normalizedRating); i++) {
+      const idx = rating > 0 ? 10 + i : 10 - i;
+      biasRating.children[idx].setAttribute("class", "fill");
+    }
   }
 }
 
