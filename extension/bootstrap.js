@@ -7,6 +7,9 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
+  this, "Config", "resource://pioneer-study-online-news/Config.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
   this, "ActiveURIService", "resource://pioneer-study-online-news/lib/ActiveURIService.jsm",
 );
 XPCOMUtils.defineLazyModuleGetter(
@@ -31,7 +34,6 @@ XPCOMUtils.defineLazyServiceGetter(
   this, "StyleSheetService", "@mozilla.org/content/style-sheet-service;1", "nsIStyleSheetService",
 );
 
-const TIMER_NAME = "pioneer-online-news-study-state";
 const REASONS = {
   APP_STARTUP:      1, // The application is starting up.
   APP_SHUTDOWN:     2, // The application is shutting down.
@@ -62,14 +64,13 @@ this.Bootstrap = {
     // Always set EXPIRATION_DATE_PREF if it not set, even if outside of install.
     // This is a failsafe if opt-out expiration doesn't work, so should be resilient.
     if (!Services.prefs.prefHasUserValue(EXPIRATION_DATE_PREF)) {
-      const now = new Date(Date.now());
-      // 70, below, is the number of days in 10 weeks.
-      const expirationDateString = new Date(now.setDate(now.getDate() + 70)).toISOString();
-      Services.prefs.setCharPref(EXPIRATION_DATE_PREF, expirationDateString);
+      const phases = Object.values(Config.phases);
+      const studyLength = phases.map(p => p.duration || 0).reduce((a, b) => a + b);
+      Services.prefs.setIntPref(EXPIRATION_DATE_PREF, Date.now() + studyLength);
     }
 
     // Check if the study has expired
-    const expirationDate = new Date(Services.prefs.getCharPref(EXPIRATION_DATE_PREF));
+    const expirationDate = Services.prefs.getIntPref(EXPIRATION_DATE_PREF);
     if (Date.now() > expirationDate) {
       Pioneer.utils.endStudy("expired");
       return;
