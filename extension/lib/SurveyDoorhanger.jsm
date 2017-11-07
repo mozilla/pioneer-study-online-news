@@ -17,30 +17,33 @@ const MESSAGES = {
   SHOW_SURVEY: "PioneerOnlineNews::show-survey",
 };
 
+const mappedWindows = new WeakMap();
+
 
 class SurveyDoorhanger {
   constructor(browserWindow) {
     this.browserWindow = browserWindow;
-
-    this.panel = Panels.getPanel(browserWindow, PANEL_ID);
-    const panelExists = !!this.panel;
-
-    if (!panelExists) {
-      this.panel = Panels.create(browserWindow, PANEL_ID, DOORHANGER_URL);
-    }
+    this.panel = Panels.create(browserWindow, PANEL_ID, DOORHANGER_URL);
     this.panelBrowser = Panels.getEmbeddedBrowser(this.panel);
 
-    if (!panelExists) {
-      const mm = this.panelBrowser.messageManager;
-      const self = this;
+    const mm = this.panelBrowser.messageManager;
+    const self = this;
 
-      Object.values(MESSAGES).forEach(message => {
-        mm.addMessageListener(message, self);
-      });
+    Object.values(MESSAGES).forEach(message => {
+      mm.addMessageListener(message, self);
+    });
 
-      mm.loadFrameScript(`${FRAME_SCRIPT_URL}?${Math.random()}`, false);
-      mm.sendAsyncMessage("PioneerOnlineNews::load", {});
+    mm.loadFrameScript(`${FRAME_SCRIPT_URL}?${Math.random()}`, false);
+    mm.sendAsyncMessage("PioneerOnlineNews::load", {});
+  }
+
+  static getOrCreate(browserWindow) {
+    if (mappedWindows.has(browserWindow)) {
+      return mappedWindows.get(browserWindow);
     }
+    const doorhanger = new SurveyDoorhanger(browserWindow);
+    mappedWindows.set(browserWindow, doorhanger);
+    return doorhanger;
   }
 
   show(surveyUrl, anchor) {

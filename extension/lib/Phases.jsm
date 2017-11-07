@@ -130,7 +130,7 @@ this.Phases = {
         const pioneerId = Pioneer.utils.getPioneerId();
         const queryString = `utm_source=pioneer&utm_campaign=online-news&pioneer_id=${pioneerId}`;
         const surveyURL = `${phase.surveyURL}?${queryString}`;
-        const dh = new SurveyDoorhanger(recentWindow);
+        const dh = SurveyDoorhanger.getOrCreate(recentWindow);
         dh.show(surveyURL);
 
         // Update state
