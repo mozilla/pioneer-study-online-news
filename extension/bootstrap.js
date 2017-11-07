@@ -44,12 +44,37 @@ const REASONS = {
 };
 const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
 const PANEL_CSS_URI = Services.io.newURI('resource://pioneer-study-online-news/content/panel.css');
-
+const EXPIRATION_DATE_PREF = "extensions.pioneer-online-news.expirationDateString";
 
 this.Bootstrap = {
   install() {},
 
-  startup(data, reason) {
+  async startup(data, reason) {
+    // Check if the user is opted in to pioneer and if not end the study
+    Pioneer.startup();
+
+    const isEligible = await Pioneer.utils.isUserOptedIn();
+    if (!isEligible) {
+      Pioneer.utils.endStudy("ineligible");
+      return;
+    }
+
+    // Always set EXPIRATION_DATE_PREF if it not set, even if outside of install.
+    // This is a failsafe if opt-out expiration doesn't work, so should be resilient.
+    if (!Services.prefs.prefHasUserValue(EXPIRATION_DATE_PREF)) {
+      const now = new Date(Date.now());
+      // 70, below, is the number of days in 10 weeks.
+      const expirationDateString = new Date(now.setDate(now.getDate() + 70)).toISOString();
+      Services.prefs.setCharPref(EXPIRATION_DATE_PREF, expirationDateString);
+    }
+
+    // Check if the study has expired
+    const expirationDate = new Date(Services.prefs.getCharPref(EXPIRATION_DATE_PREF));
+    if (Date.now() > expirationDate) {
+      Pioneer.utils.endStudy("expired");
+      return;
+    }
+
     // If the app is starting up, wait until the UI is available before finishing
     // init.
     if (reason === REASONS.APP_STARTUP) {
@@ -71,13 +96,6 @@ this.Bootstrap = {
    * not to slow down browser startup.
    */
   async finishStartup() {
-    // Check if the user is opted in to pioneer and if not end the study
-    Pioneer.startup();
-    if (!Pioneer.utils.isUserOptedIn()) {
-      Pioneer.utils.endStudy(Pioneer.utils.EVENTS.INELIGIBLE);
-      return false;
-    }
-
     StyleSheetService.loadAndRegisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
 
     await NewsIndexedDB.startup();
