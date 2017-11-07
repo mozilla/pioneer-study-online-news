@@ -54,10 +54,11 @@ this.Bootstrap = {
   async startup(data, reason) {
     // Check if the user is opted in to pioneer and if not end the study
     Pioneer.startup();
+    const events = Pioneer.utils.getAvailableEvents();
 
     const isEligible = await Pioneer.utils.isUserOptedIn();
     if (!isEligible) {
-      Pioneer.utils.endStudy("ineligible");
+      Pioneer.utils.endStudy(events.INELIGIBLE);
       return;
     }
 
@@ -72,7 +73,7 @@ this.Bootstrap = {
     // Check if the study has expired
     const expirationDate = Services.prefs.getIntPref(EXPIRATION_DATE_PREF);
     if (Date.now() > expirationDate) {
-      Pioneer.utils.endStudy("expired");
+      Pioneer.utils.endStudy(events.EXPIRED);
       return;
     }
 

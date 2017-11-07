@@ -22,7 +22,7 @@ const Config = {
   studyName: "online-news",
   branches: [
     { name: "control", weight: 1 },
-    { name: "treatment", weight: 1 },
+    { name: "treatment", weight: 1, showDoorhanger: true },
   ],
   telemetryEnv: Services.prefs.getCharPref(TELEMETRY_ENV_PREF, "prod"),
 
