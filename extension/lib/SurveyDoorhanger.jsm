@@ -69,7 +69,7 @@ class SurveyDoorhanger {
     // If the current phase is a survey only skip ahead
     const phase = Phases.getCurrentPhase();
     if (phase.surveyOnly) {
-      this.gotoNextPhase();
+      Phases.gotoNextPhase();
     }
   }
 

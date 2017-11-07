@@ -127,11 +127,12 @@ this.Phases = {
       });
 
       if (recentWindow && recentWindow.gBrowser) {
-        const pioneerId = Pioneer.utils.getPioneerId();
-        const queryString = `utm_source=pioneer&utm_campaign=online-news&pioneer_id=${pioneerId}`;
-        const surveyURL = `${phase.surveyURL}?${queryString}`;
+        const surveyURL = new URL(phase.surveyURL);
+        surveyURL.searchParams.set("utm_source", "pioneer");
+        surveyURL.searchParams.set("utm_campaign", "online-news");
+        surveyURL.searchParams.set("pioneer_id", Pioneer.utils.getPioneerId());
         const dh = SurveyDoorhanger.getOrCreate(recentWindow);
-        dh.show(surveyURL);
+        dh.show(surveyURL.href);
 
         // Update state
         state.promptsRemaining[state.phaseName] -= 1;
