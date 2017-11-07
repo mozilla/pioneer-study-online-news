@@ -4,6 +4,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 const EXPORTED_SYMBOLS = ["Config"];
 
+const TELEMETRY_ENV_PREF = "extensions.pioneer-online-news.telemetryEnv";
 const UPDATE_TIMER_PREF = "extensions.pioneer-online-news.updateTimerInterval";
 const DOORHANGER_INTERVAL_PREF = "extensions.pioneer-online-news.showDoorhangerInterval";
 const LOG_INTERVAL_PREF = "extensions.pioneer-online-news.logSubmissionInterval";
@@ -23,6 +24,7 @@ const Config = {
     { name: "control", weight: 1 },
     { name: "treatment", weight: 1 },
   ],
+  telemetryEnv: Services.prefs.getCharPref(TELEMETRY_ENV_PREF, "prod"),
 
   updateTimerInterval: Services.prefs.getIntPref(UPDATE_TIMER_PREF, 1 * DAY),
   showDoorhangerInterval: Services.prefs.getIntPref(DOORHANGER_INTERVAL_PREF, 1 * DAY),
