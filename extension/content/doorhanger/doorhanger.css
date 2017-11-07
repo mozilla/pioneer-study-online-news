@@ -64,6 +64,7 @@ footer {
     text-align: center;
 }
 
+.buttons > button.double,
 .buttons > button:nth-of-type(even) {
     border: 0;
 }

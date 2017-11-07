@@ -120,6 +120,7 @@ this.Bootstrap = {
     Cu.unload("resource://pioneer-study-online-news/lib/Panels.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/Hosts.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/BiasDoorhanger.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/SurveyDoorhanger.jsm");
   },
 
   uninstall() {},

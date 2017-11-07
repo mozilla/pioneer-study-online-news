@@ -26,6 +26,9 @@ XPCOMUtils.defineLazyModuleGetter(
 XPCOMUtils.defineLazyModuleGetter(
   this, "State", "resource://pioneer-study-online-news/lib/State.jsm"
 );
+XPCOMUtils.defineLazyModuleGetter(
+  this, "SurveyDoorhanger", "resource://pioneer-study-online-news/lib/SurveyDoorhanger.jsm"
+);
 
 this.EXPORTED_SYMBOLS = ["Phases"];
 
@@ -42,6 +45,8 @@ this.Phases = {
     } else {
       timerManager.registerTimer(TIMER_NAME, this.updateStateMachine.bind(this), Config.updateTimerInterval);
     }
+
+    this.updateStateMachine();
   },
 
   shutdown() {
@@ -69,6 +74,10 @@ this.Phases = {
       throw new Error(`Unknown study phase ${state.phaseName}`);
     }
 
+    if (phase.surveyURL) {
+      this.showSurvey(phase.surveyURL);
+    }
+
     const now = Date.now();
     const sinceLastTransition = now - state.lastTransition;
     if (phase.duration && sinceLastTransition >= phase.duration) {
@@ -89,19 +98,12 @@ this.Phases = {
       Pioneer.utils.endStudy();
       return;
     }
-
-    if (phase.surveyURL) {
-      this.showSurvey(phase.surveyURL);
-    }
   },
 
   /**
    * Prompts the user to take a survey.
    */
   showSurvey() {
-    // TODO: show doorhanger instead of opening tab directly
-    // TODO: Only show a survey once per ${INTERVAL}.
-
     const state = State.load();
     const phase = this.getCurrentPhase();
 
@@ -109,19 +111,33 @@ this.Phases = {
       state.promptsRemaining[state.phaseName] = phase.promptRepeat || 3;
     }
 
-    if (state.promptsRemaining[state.phaseName] > 0) {
-      state.promptsRemaining[state.phaseName] -= 1;
-      State.save(state);
+    const hasPromptsRemaining = state.promptsRemaining[state.phaseName] > 0;
+
+    if (!state.lastSurveyShown.hasOwnProperty(state.phaseName)) {
+      state.lastSurveyShown[state.phaseName] = 0;
+    }
+
+    const timesinceSurveyShown = Date.now() - state.lastSurveyShown[state.phaseName];
+    const shouldShowDoorhanger = timesinceSurveyShown > Config.showDoorhangerInterval;
+
+    if (shouldShowDoorhanger && hasPromptsRemaining) {
       const recentWindow = RecentWindow.getMostRecentBrowserWindow({
         private: false,
         allowPopups: false,
       });
+
       if (recentWindow && recentWindow.gBrowser) {
-        // TODO: add pioneerID and utm_source parameters to surveyURL
-        const tab = recentWindow.gBrowser.loadOneTab(phase.surveyURL, { inBackground: false });
+        const pioneerId = Pioneer.utils.getPioneerId();
+        const queryString = `utm_source=pioneer&utm_campaign=online-news&pioneer_id=${pioneerId}`;
+        const surveyURL = `${phase.surveyURL}?${queryString}`;
+        const dh = new SurveyDoorhanger(recentWindow);
+        dh.show(surveyURL);
+
+        // Update state
+        state.promptsRemaining[state.phaseName] -= 1;
+        state.lastSurveyShown[state.phaseName] = Date.now();
+        State.save(state);
       }
-    } else if (phase.surveyOnly) {
-      this.gotoNextPhase();
     }
   },
 };
