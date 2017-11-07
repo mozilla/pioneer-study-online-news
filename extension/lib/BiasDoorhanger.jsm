@@ -54,7 +54,9 @@ class BiasDoorhanger {
   show(anchor) {
     const document = this.browserWindow.window.document;
     if (!anchor) {
-      anchor = document.getElementById("PanelUI-menu-button"); // Hamburger menu button
+      const urlBar = document.getElementById("urlbar");  // Address bar
+      const burgerButton = document.getElementById("PanelUI-menu-button");  // Hamburger button
+      anchor = urlBar || burgerButton;
     }
     this.panelBrowser.messageManager.sendAsyncMessage("PioneerOnlineNews::update", {
       rating: Hosts.getRatingForURI(this.focusedURI)
