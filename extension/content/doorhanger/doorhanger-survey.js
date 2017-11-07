@@ -29,7 +29,6 @@ function load() {
 function setupButtons() {
   const showSurveyButton = document.getElementById("show-survey-button");
 
-
   showSurveyButton.addEventListener("click", () => {
     port.emit("PioneerOnlineNews::show-survey");
   });

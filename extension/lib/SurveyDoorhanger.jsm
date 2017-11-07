@@ -5,6 +5,9 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(
   this, "Panels", "resource://pioneer-study-online-news/lib/Panels.jsm",
 );
+XPCOMUtils.defineLazyModuleGetter(
+  this, "Phases", "resource://pioneer-study-online-news/lib/Phases.jsm",
+);
 
 const DOORHANGER_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-survey.html";
 const FRAME_SCRIPT_URL = "resource://pioneer-study-online-news/content/doorhanger/doorhanger-survey.js";
@@ -59,6 +62,12 @@ class SurveyDoorhanger {
     const browser = this.browserWindow.gBrowser;
     browser.selectedTab = browser.addTab(this.surveyUrl);
     this.hide();
+
+    // If the current phase is a survey only skip ahead
+    const phase = Phases.getCurrentPhase();
+    if (phase.surveyOnly) {
+      this.gotoNextPhase();
+    }
   }
 
   receiveMessage(message) {
