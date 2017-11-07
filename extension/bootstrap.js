@@ -72,9 +72,10 @@ this.Bootstrap = {
    */
   async finishStartup() {
     // Check if the user is opted in to pioneer and if not end the study
+    const events = Pioneer.utils.getAvailableEvents();
     Pioneer.startup();
     if (!Pioneer.utils.isUserOptedIn()) {
-      Pioneer.utils.endStudy(Pioneer.utils.EVENTS.INELIGIBLE);
+      Pioneer.utils.endStudy(events.INELIGIBLE);
       return false;
     }
 
