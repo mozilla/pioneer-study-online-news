@@ -64,14 +64,15 @@ this.Bootstrap = {
 
     // Always set EXPIRATION_DATE_PREF if it not set, even if outside of install.
     // This is a failsafe if opt-out expiration doesn't work, so should be resilient.
-    if (!Services.prefs.prefHasUserValue(EXPIRATION_DATE_PREF)) {
+    let expirationDate = Services.prefs.getIntPref(EXPIRATION_DATE_PREF);
+    if (!expirationDate) {
       const phases = Object.values(Config.phases);
       const studyLength = phases.map(p => p.duration || 0).reduce((a, b) => a + b);
-      Services.prefs.setIntPref(EXPIRATION_DATE_PREF, Date.now() + studyLength);
+      expirationDate = Date.now() + studyLength;
+      Services.prefs.setIntPref(EXPIRATION_DATE_PREF, expirationDate);
     }
 
     // Check if the study has expired
-    const expirationDate = Services.prefs.getIntPref(EXPIRATION_DATE_PREF);
     if (Date.now() > expirationDate) {
       Pioneer.utils.endStudy(events.EXPIRED);
       return;
