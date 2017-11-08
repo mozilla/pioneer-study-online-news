@@ -70,7 +70,6 @@ const Config = {
       next: 'postTreatment',
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-2",
       treatment: true,
-      promptRepeat: 2,
     },
 
     postTreatment: {
