@@ -64,7 +64,7 @@ this.Bootstrap = {
 
     // Always set EXPIRATION_DATE_PREF if it not set, even if outside of install.
     // This is a failsafe if opt-out expiration doesn't work, so should be resilient.
-    let expirationDate = Services.prefs.getIntPref(EXPIRATION_DATE_PREF);
+    let expirationDate = Services.prefs.getIntPref(EXPIRATION_DATE_PREF, 0);
     if (!expirationDate) {
       const phases = Object.values(Config.phases);
       const studyLength = phases.map(p => p.duration || 0).reduce((a, b) => a + b);
@@ -125,7 +125,7 @@ this.Bootstrap = {
     Phases.shutdown();
     NewsIndexedDB.shutdown();
     
-    if(StyleSheetService.sheetRegistered(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET)) {
+    if (StyleSheetService.sheetRegistered(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET)) {
       StyleSheetService.unregisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
     }
 
