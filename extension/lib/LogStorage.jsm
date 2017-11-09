@@ -16,6 +16,9 @@ XPCOMUtils.defineLazyModuleGetter(
 XPCOMUtils.defineLazyModuleGetter(
   this, "Pioneer", "resource://pioneer-study-online-news/lib/Pioneer.jsm"
 );
+XPCOMUtils.defineLazyModuleGetter(
+  this, "PrefUtils", "resource://pioneer-study-online-news/lib/PrefUtils.jsm"
+);
 
 this.EXPORTED_SYMBOLS = ["LogStorage"];
 
@@ -38,13 +41,13 @@ this.LogStorage = {
   async uploadPings() {
     // upload ping dataset at the most once a day
     const payload = await this.getAll();
-    const lastUploadDate = Services.prefs.getIntPref(UPLOAD_DATE_PREF, 0);
+    const lastUploadDate = PrefUtils.getInt64Pref(UPLOAD_DATE_PREF, 0);
     const timesinceLastUpload = Date.now() - lastUploadDate;
 
     if (timesinceLastUpload > Config.logSubmissionInterval) {
       await Pioneer.utils.submitEncryptedPing("online-news-log", 1, { entries: payload });
       await this.clear();
-      Services.prefs.setIntPref(UPLOAD_DATE_PREF, Date.now());
+      PrefUtils.setInt64Pref(UPLOAD_DATE_PREF, Date.now());
     }
   },
 

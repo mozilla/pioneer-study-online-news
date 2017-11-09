@@ -30,6 +30,9 @@ XPCOMUtils.defineLazyModuleGetter(
 XPCOMUtils.defineLazyModuleGetter(
   this, "NewsIndexedDB", "resource://pioneer-study-online-news/lib/NewsIndexedDB.jsm"
 );
+XPCOMUtils.defineLazyModuleGetter(
+  this, "PrefUtils", "resource://pioneer-study-online-news/lib/PrefUtils.jsm"
+);
 XPCOMUtils.defineLazyServiceGetter(
   this, "StyleSheetService", "@mozilla.org/content/style-sheet-service;1", "nsIStyleSheetService",
 );
@@ -64,12 +67,12 @@ this.Bootstrap = {
 
     // Always set EXPIRATION_DATE_PREF if it not set, even if outside of install.
     // This is a failsafe if opt-out expiration doesn't work, so should be resilient.
-    let expirationDate = Services.prefs.getIntPref(EXPIRATION_DATE_PREF, 0);
+    let expirationDate = PrefUtils.getInt64Pref(EXPIRATION_DATE_PREF, 0);
     if (!expirationDate) {
       const phases = Object.values(Config.phases);
       const studyLength = phases.map(p => p.duration || 0).reduce((a, b) => a + b);
       expirationDate = Date.now() + studyLength;
-      Services.prefs.setIntPref(EXPIRATION_DATE_PREF, expirationDate);
+      PrefUtils.setInt64Pref(EXPIRATION_DATE_PREF, expirationDate);
     }
 
     // Check if the study has expired
@@ -142,6 +145,7 @@ this.Bootstrap = {
     Cu.unload("resource://pioneer-study-online-news/lib/Hosts.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/BiasDoorhanger.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/SurveyDoorhanger.jsm");
+    Cu.unload("resource://pioneer-study-online-news/lib/PrefUtils.jsm");
   },
 
   uninstall() {},
