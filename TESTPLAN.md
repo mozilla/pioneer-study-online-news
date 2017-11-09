@@ -100,9 +100,19 @@ By default it is 1 week long.
 
 This is set during the second phase of the study.
 
-`treatment` is the branch where the bias rating doorhanger is shown.
+The `treatment` branch is where the bias rating doorhanger is shown.
 
-`control` is the branch where no bias rating doorhanger is shown.
+The `control` branch is where no bias rating doorhanger is shown.
+
+`extensions.pioneer-online-news.logUploadAttemptInterval`
+
+**Default:** `10800000`
+
+This sets the frequency at which the addon attempts to upload the log. If the
+time specified in `extensions.pioneer-online-news.logSubmissionInterval` has 
+not passed it will not be uploaded. You should make sure this is always less
+than `extensions.pioneer-online-news.logSubmissionInterval`. By default it is set
+to 3 hours.
 
 
 ### Installing the addon

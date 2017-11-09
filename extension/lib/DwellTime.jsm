@@ -23,9 +23,7 @@ XPCOMUtils.defineLazyServiceGetter(
 this.EXPORTED_SYMBOLS = ["DwellTime"];
 
 const ACCEPTED_SCHEMES = new Set(['http', 'https']);
-// Schedule uploads to run on a 3 hour interval
-// Reduce this interval to test the uploads
-const DELAY_TIME = 1000 * 3 * 60 * 60;
+
 
 this.DwellTime = {
   dwellStartTime: null, // Timestamp when the idle state or focused host last changed
