@@ -49,7 +49,7 @@ const REASONS = {
 };
 const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
 const PANEL_CSS_URI = Services.io.newURI('resource://pioneer-study-online-news/content/panel.css');
-const EXPIRATION_DATE_PREF = "extensions.pioneer-online-news.expirationDateString";
+const EXPIRATION_DATE_PREF = "extensions.pioneer-online-news.expirationDate";
 
 this.Bootstrap = {
   install() {},
