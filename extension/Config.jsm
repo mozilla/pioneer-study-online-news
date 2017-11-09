@@ -33,7 +33,7 @@ const Config = {
   updateTimerInterval: Services.prefs.getIntPref(UPDATE_TIMER_PREF, 1 * DAY),
   showDoorhangerInterval: Services.prefs.getIntPref(DOORHANGER_INTERVAL_PREF, 1 * DAY),
   logSubmissionInterval: Services.prefs.getIntPref(LOG_INTERVAL_PREF, 1 * DAY),
-  logUploadAttemptInterval: Service.prefs.getIntPref(LOG_UPLOAD_ATTEMPT_PREF, 3 * HOUR),
+  logUploadAttemptInterval: Services.prefs.getIntPref(LOG_UPLOAD_ATTEMPT_PREF, 3 * HOUR),
 
   // Note: This is set in seconds not milliseconds
   idleDelaySeconds: Services.prefs.getIntPref(IDLE_DELAY_PREF, 5),
