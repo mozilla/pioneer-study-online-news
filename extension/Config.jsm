@@ -12,8 +12,12 @@ const PRETREATMENT_DURATION_PREF = "extensions.pioneer-online-news.preTreatmentD
 const TREATMENT_DURATION_PREF = "extensions.pioneer-online-news.treatmentDuration";
 const POSTTREATMENT_DURATION_PREF = "extensions.pioneer-online-news.postTreatmentDuration";
 const POSTSTUDY_DURATION_PREF = "extensions.pioneer-online-news.postStudyDuration";
+const IDLE_DELAY_PREF = "extensions.pioneer-online-news.idleDelaySeconds";
+const LOG_UPLOAD_ATTEMPT_PREF = "extensions.pioneer-online-news.logUploadAttemptInterval";
 
-const HOUR = 1000 * 60 * 60;
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 const WEEK = 7 * DAY;
 
@@ -29,6 +33,10 @@ const Config = {
   updateTimerInterval: Services.prefs.getIntPref(UPDATE_TIMER_PREF, 1 * DAY),
   showDoorhangerInterval: Services.prefs.getIntPref(DOORHANGER_INTERVAL_PREF, 1 * DAY),
   logSubmissionInterval: Services.prefs.getIntPref(LOG_INTERVAL_PREF, 1 * DAY),
+  logUploadAttemptInterval: Services.prefs.getIntPref(LOG_UPLOAD_ATTEMPT_PREF, 3 * HOUR),
+
+  // Note: This is set in seconds not milliseconds
+  idleDelaySeconds: Services.prefs.getIntPref(IDLE_DELAY_PREF, 5),
 
   /**
    * @typedef {Object} Phase

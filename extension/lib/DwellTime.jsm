@@ -8,6 +8,9 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Timer.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
+  this, "Config", "resource://pioneer-study-online-news/Config.jsm"
+);
+XPCOMUtils.defineLazyModuleGetter(
   this, "LogStorage", "resource://pioneer-study-online-news/lib/LogStorage.jsm"
 );
 XPCOMUtils.defineLazyModuleGetter(
@@ -20,23 +23,18 @@ XPCOMUtils.defineLazyServiceGetter(
 this.EXPORTED_SYMBOLS = ["DwellTime"];
 
 const ACCEPTED_SCHEMES = new Set(['http', 'https']);
-const IDLE_DELAY_SECONDS = Services.prefs.getIntPref(
-  "extensions.pioneer-study-online-news.idleDelaySeconds", 5,
-);
-// Schedule uploads to run on a 3 hour interval
-// Reduce this interval to test the uploads
-const DELAY_TIME = 1000 * 3 * 60 * 60;
+
 
 this.DwellTime = {
   dwellStartTime: null, // Timestamp when the idle state or focused host last changed
   focusedUrl: null, // URL of the currently-focused URI
 
   startup() {
-    IdleService.addIdleObserver(this, IDLE_DELAY_SECONDS);
+    IdleService.addIdleObserver(this, Config.idleDelaySeconds);
     ActiveURIService.addObserver(this);
     this.onFocusURI(ActiveURIService.focusedURI);
     LogStorage.uploadPings();
-    setInterval(LogStorage.uploadPings.bind(LogStorage), DELAY_TIME);
+    setInterval(LogStorage.uploadPings.bind(LogStorage), Config.logUploadAttemptInterval);
   },
 
   shutdown() {
