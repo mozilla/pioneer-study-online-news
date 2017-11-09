@@ -67,12 +67,12 @@ this.Bootstrap = {
 
     // Always set EXPIRATION_DATE_PREF if it not set, even if outside of install.
     // This is a failsafe if opt-out expiration doesn't work, so should be resilient.
-    let expirationDate = PrefUtils.getInt64Pref(EXPIRATION_DATE_PREF, 0);
+    let expirationDate = PrefUtils.getLongPref(EXPIRATION_DATE_PREF, 0);
     if (!expirationDate) {
       const phases = Object.values(Config.phases);
       const studyLength = phases.map(p => p.duration || 0).reduce((a, b) => a + b);
       expirationDate = Date.now() + studyLength;
-      PrefUtils.setInt64Pref(EXPIRATION_DATE_PREF, expirationDate);
+      PrefUtils.setLongPref(EXPIRATION_DATE_PREF, expirationDate);
     }
 
     // Check if the study has expired

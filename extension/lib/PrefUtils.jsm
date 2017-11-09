@@ -3,11 +3,11 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 
 const PrefUtils = {
-  setInt64Pref(name, value) {
+  setLongPref(name, value) {
     return Services.prefs.setCharPref(name, `${value}`);
   },
 
-  getInt64Pref(name, defaultValue) {
+  getLongPref(name, defaultValue) {
     return parseInt(Services.prefs.getCharPref(name, `${defaultValue}`), 10);
   }
 };

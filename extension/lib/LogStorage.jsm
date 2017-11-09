@@ -41,13 +41,13 @@ this.LogStorage = {
   async uploadPings() {
     // upload ping dataset at the most once a day
     const payload = await this.getAll();
-    const lastUploadDate = PrefUtils.getInt64Pref(UPLOAD_DATE_PREF, 0);
+    const lastUploadDate = PrefUtils.getLongPref(UPLOAD_DATE_PREF, 0);
     const timesinceLastUpload = Date.now() - lastUploadDate;
 
     if (timesinceLastUpload > Config.logSubmissionInterval) {
       await Pioneer.utils.submitEncryptedPing("online-news-log", 1, { entries: payload });
       await this.clear();
-      PrefUtils.setInt64Pref(UPLOAD_DATE_PREF, Date.now());
+      PrefUtils.setLongPref(UPLOAD_DATE_PREF, Date.now());
     }
   },
 
