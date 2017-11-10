@@ -21,16 +21,19 @@ port.on("PioneerOnlineNews::load", data => {
   content.addEventListener("load", () => load(data));
 });
 
-port.on("PioneerOnlineNews::update", data => updateRating(data));
+port.on("PioneerOnlineNews::update", update);
 
 function load() {
   document = content.document;
   setupButtons();
 }
 
-function updateRating(data) {
+function update(data) {
   const rating = data.rating;
   const biasRating = document.getElementById("bias-rating");
+
+  // Clears any text selected in the doorhanger (bug 1416204)
+  content.getSelection().removeAllRanges();
 
   /**
    * The rating is -2.0 to 2.0 so we multiple by 10 and divide by 2

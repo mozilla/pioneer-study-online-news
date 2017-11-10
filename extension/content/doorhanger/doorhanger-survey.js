@@ -21,9 +21,16 @@ port.on("PioneerOnlineNews::load", data => {
   content.addEventListener("load", () => load(data));
 });
 
+port.on("PioneerOnlineNews::update", update);
+
 function load() {
   document = content.document;
   setupButtons();
+}
+
+function update() {
+  // Clears any text selected in the doorhanger (bug 1416204)
+  content.getSelection().removeAllRanges();
 }
 
 function setupButtons() {
