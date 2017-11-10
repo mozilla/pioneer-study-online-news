@@ -47,6 +47,7 @@ class SurveyDoorhanger {
   }
 
   show(surveyUrl, anchor) {
+    Panels.ensureStyleSheetsLoaded();
     this.surveyUrl = surveyUrl;
     const document = this.browserWindow.window.document;
     if (!anchor) {

@@ -33,8 +33,8 @@ XPCOMUtils.defineLazyModuleGetter(
 XPCOMUtils.defineLazyModuleGetter(
   this, "PrefUtils", "resource://pioneer-study-online-news/lib/PrefUtils.jsm"
 );
-XPCOMUtils.defineLazyServiceGetter(
-  this, "StyleSheetService", "@mozilla.org/content/style-sheet-service;1", "nsIStyleSheetService",
+XPCOMUtils.defineLazyModuleGetter(
+  this, "Panels", "resource://pioneer-study-online-news/lib/Panels.jsm"
 );
 
 const REASONS = {
@@ -48,7 +48,6 @@ const REASONS = {
   ADDON_DOWNGRADE:  8, // The add-on is being downgraded.
 };
 const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
-const PANEL_CSS_URI = Services.io.newURI('resource://pioneer-study-online-news/content/panel.css');
 const EXPIRATION_DATE_PREF = "extensions.pioneer-online-news.expirationDate";
 
 this.Bootstrap = {
@@ -102,9 +101,8 @@ this.Bootstrap = {
    * not to slow down browser startup.
    */
   async finishStartup() {
-    StyleSheetService.loadAndRegisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
-
     await NewsIndexedDB.startup();
+    Panels.startup();
     Hosts.startup();
     ActiveURIService.startup();
     DwellTime.startup();
@@ -127,10 +125,7 @@ this.Bootstrap = {
     ActiveURIService.shutdown();
     Phases.shutdown();
     NewsIndexedDB.shutdown();
-    
-    if (StyleSheetService.sheetRegistered(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET)) {
-      StyleSheetService.unregisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
-    }
+    Panels.shutdown();
 
     Cu.unload("resource://pioneer-study-online-news/Config.jsm");
     Cu.unload("resource://pioneer-study-online-news/lib/Pioneer.jsm");
