@@ -8,6 +8,8 @@ TMP_DIR=$(mktemp -d)
 DEST="${TMP_DIR}/addon"
 XPI="${XPI:-addon.xpi}"
 
+npm install 
+
 mkdir -p "$DEST"
 
 # deletes the temp directory
