@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "A Pioneer study looking at online news consumption.",
   "scripts": {
-    "build": "XPI=pioneer-study-online-news@mozilla.org.xpi bash ./bin/make-xpi.sh"
+    "build": "npm install; XPI=pioneer-study-online-news@mozilla.org.xpi bash ./bin/make-xpi.sh"
   },
   "keywords": [],
   "author": "Mozilla",
