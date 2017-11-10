@@ -1,6 +1,33 @@
+const { utils: Cu } = Components;
+Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyServiceGetter(
+  this, "StyleSheetService", "@mozilla.org/content/style-sheet-service;1", "nsIStyleSheetService",
+);
+
 this.EXPORTED_SYMBOLS = ["Panels"];
 
+const PANEL_CSS_URI = Services.io.newURI('resource://pioneer-study-online-news/content/panel.css');
+
+
 const Panels = {
+  startup() {
+    this.ensureStyleSheetsLoaded();
+  },
+
+  shutdown() {
+    if (StyleSheetService.sheetRegistered(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET)) {
+      StyleSheetService.unregisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
+    }
+  },
+
+  ensureStyleSheetsLoaded() {
+    if (!StyleSheetService.sheetRegistered(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET)) {
+      StyleSheetService.loadAndRegisterSheet(PANEL_CSS_URI, StyleSheetService.AGENT_SHEET);
+    }
+  },
+
   create(browserWindow, id, src) {
     const document = browserWindow.window.document;
     let panel = this.getPanel(browserWindow, id);

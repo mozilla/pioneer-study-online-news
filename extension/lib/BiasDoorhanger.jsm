@@ -52,6 +52,7 @@ class BiasDoorhanger {
   }
 
   show(anchor) {
+    Panels.ensureStyleSheetsLoaded();
     const document = this.browserWindow.window.document;
     if (!anchor) {
       const urlBar = document.getElementById("urlbar");  // Address bar
