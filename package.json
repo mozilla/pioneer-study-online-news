@@ -1,6 +1,6 @@
 {
   "name": "pioneer-study-online-news",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A Pioneer study looking at online news consumption.",
   "scripts": {
     "build": "XPI=pioneer-study-online-news@mozilla.org.xpi bash ./bin/make-xpi.sh"
