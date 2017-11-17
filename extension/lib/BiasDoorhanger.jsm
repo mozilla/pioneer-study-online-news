@@ -146,7 +146,9 @@ class BiasDoorhanger {
 
       const stats = await DoorhangerStorage.getStats(hostname);
       const timeSinceShown = Date.now() - stats.timestamp;
-      const shouldShow = !stats.neverAgain && timeSinceShown > Config.showDoorhangerInterval;
+      const hiddenTooQuickly = timeSinceShown < 1000;
+      const enoughTimePassed = timeSinceShown > Config.showDoorhangerInterval;
+      const shouldShow = !stats.neverAgain && (hiddenTooQuickly || enoughTimePassed);
 
       const branchName = Services.prefs.getCharPref(STUDY_BRANCH_PREF, "");
       let branch = Config.branches.find(b => b.name === branchName);
