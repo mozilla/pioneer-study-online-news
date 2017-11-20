@@ -22,7 +22,7 @@ XPCOMUtils.defineLazyServiceGetter(
 
 this.EXPORTED_SYMBOLS = ["DwellTime"];
 
-const ACCEPTED_SCHEMES = new Set(['http', 'https']);
+const ACCEPTED_SCHEMES = new Set(["http", "https"]);
 
 
 this.DwellTime = {
@@ -39,7 +39,7 @@ this.DwellTime = {
 
   shutdown() {
     ActiveURIService.removeObserver(this);
-    IdleService.removeIdleObserver(this, IDLE_DELAY_SECONDS);
+    IdleService.removeIdleObserver(this, Config.idleDelaySeconds);
   },
 
   /**
@@ -54,7 +54,7 @@ this.DwellTime = {
       return;
     }
 
-    let unixTs = Math.round(now/1000);
+    let unixTs = Math.round(now / 1000);
     let obj = {url: this.focusedUrl, details: idle_tag, timestamp: unixTs};
     LogStorage.put(obj);
   },
@@ -62,27 +62,25 @@ this.DwellTime = {
   onFocusURI(data) {
     const uri = data.uri;
     const now = Date.now();
-    this.logPreviousDwell('focus-end', now);
+    this.logPreviousDwell("focus-end", now);
 
-    let host = null;
     let url = null;
     if (uri && ACCEPTED_SCHEMES.has(uri.scheme)) {
-      host = uri.host;
       url = uri.spec;
     }
 
     this.focusedUrl = url;
-    this.logPreviousDwell('focus-start', now);
+    this.logPreviousDwell("focus-start", now);
   },
 
   onIdle() {
     const now = Date.now();
-    this.logPreviousDwell('idle-start', now);
+    this.logPreviousDwell("idle-start", now);
   },
 
   onIdleBack() {
     const now = Date.now();
-    this.logPreviousDwell('idle-end', now);
+    this.logPreviousDwell("idle-end", now);
   },
 
   observe(subject, topic, data) {

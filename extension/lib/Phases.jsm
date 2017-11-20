@@ -6,7 +6,7 @@ const { utils: Cu } = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Timer.jsm");
-Cu.importGlobalProperties(['URL']);
+Cu.importGlobalProperties(["URL"]);
 
 XPCOMUtils.defineLazyModuleGetter(
   this, "AddonManager", "resource://gre/modules/AddonManager.jsm"
@@ -97,7 +97,6 @@ this.Phases = {
 
     if (phase.lastPhase) {
       Pioneer.utils.endStudy();
-      return;
     }
   },
 
