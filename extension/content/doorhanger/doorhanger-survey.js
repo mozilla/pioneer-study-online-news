@@ -24,7 +24,7 @@ port.on("PioneerOnlineNews::load", data => {
 port.on("PioneerOnlineNews::update", update);
 
 function load() {
-  document = content.document;
+  document = content.document; // eslint-disable-line no-native-reassign
   setupButtons();
 }
 

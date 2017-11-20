@@ -1,5 +1,5 @@
 const { utils: Cu } = Components;
-Cu.importGlobalProperties(['fetch']);
+Cu.importGlobalProperties(["fetch"]);
 
 this.EXPORTED_SYMBOLS = ["Hosts"];
 

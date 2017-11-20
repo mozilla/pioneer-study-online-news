@@ -64,32 +64,32 @@ const Config = {
    *    Optional. If the treatment should be shown during this phase.
    */
 
-  firstPhase: 'preTreatment',
+  firstPhase: "preTreatment",
 
   phases: {
     preTreatment: {
       duration: Services.prefs.getIntPref(PRETREATMENT_DURATION_PREF, 3 * WEEK),
-      next: 'treatment',
+      next: "treatment",
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-1",
     },
 
     treatment: {
       duration: Services.prefs.getIntPref(TREATMENT_DURATION_PREF, 3 * WEEK),
-      next: 'postTreatment',
+      next: "postTreatment",
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-2",
       treatment: true,
     },
 
     postTreatment: {
       duration: Services.prefs.getIntPref(POSTTREATMENT_DURATION_PREF, 3 * WEEK),
-      next: 'postStudy',
+      next: "postStudy",
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-3",
     },
 
     postStudy: {
       duration: Services.prefs.getIntPref(POSTSTUDY_DURATION_PREF, 1 * WEEK),
       surveyOnly: true,
-      next: 'studyEnd',
+      next: "studyEnd",
       surveyURL: "https://qsurvey.mozilla.com/s3/Pioneer-Online-News-Wave-4",
     },
 

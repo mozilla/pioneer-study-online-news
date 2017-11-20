@@ -8,7 +8,7 @@ XPCOMUtils.defineLazyServiceGetter(
 
 this.EXPORTED_SYMBOLS = ["Panels"];
 
-const PANEL_CSS_URI = Services.io.newURI('resource://pioneer-study-online-news/content/panel.css');
+const PANEL_CSS_URI = Services.io.newURI("resource://pioneer-study-online-news/content/panel.css");
 
 
 const Panels = {

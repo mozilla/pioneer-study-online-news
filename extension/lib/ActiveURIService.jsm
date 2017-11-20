@@ -89,7 +89,7 @@ this.ActiveURIService = {
   setFocusedURI(domWindow, uri) {
     this.focusedURI = uri;
     for (const observer of this.observers) {
-      observer.observe(this, 'uriFocused', {
+      observer.observe(this, "uriFocused", {
         window: domWindow,
         uri
       });

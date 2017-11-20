@@ -55,8 +55,8 @@ class BiasDoorhanger {
     Panels.ensureStyleSheetsLoaded();
     const document = this.browserWindow.window.document;
     if (!anchor) {
-      const urlBar = document.getElementById("urlbar");  // Address bar
-      const burgerButton = document.getElementById("PanelUI-menu-button");  // Hamburger button
+      const urlBar = document.getElementById("urlbar"); // Address bar
+      const burgerButton = document.getElementById("PanelUI-menu-button"); // Hamburger button
       anchor = urlBar || burgerButton;
     }
     this.panelBrowser.messageManager.sendAsyncMessage("PioneerOnlineNews::update", {
@@ -92,15 +92,15 @@ class BiasDoorhanger {
   logInteraction(details) {
     const entry = {
       url: this.focusedURI.spec,
-      timestamp: Math.round(Date.now()/1000),
+      timestamp: Math.round(Date.now() / 1000),
       details,
     };
-    Pioneer.utils.submitEncryptedPing("online-news-log", 1, {entries: [entry]})
+    Pioneer.utils.submitEncryptedPing("online-news-log", 1, {entries: [entry]});
   }
 
   onAgree() {
     this.logInteraction("agree");
-    this.hideForever()
+    this.hideForever();
   }
 
   onDisagree() {
