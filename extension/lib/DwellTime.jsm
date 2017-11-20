@@ -39,7 +39,7 @@ this.DwellTime = {
 
   shutdown() {
     ActiveURIService.removeObserver(this);
-    IdleService.removeIdleObserver(this, IDLE_DELAY_SECONDS);
+    IdleService.removeIdleObserver(this, Config.idleDelaySeconds);
   },
 
   /**
