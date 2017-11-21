@@ -1,6 +1,6 @@
 {
   "name": "pioneer-study-online-news",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A Pioneer study looking at online news consumption.",
   "scripts": {
     "build": "XPI=pioneer-study-online-news@mozilla.org.xpi bash ./bin/make-xpi.sh"
@@ -13,6 +13,6 @@
     "eslint-plugin-mozilla": "^0.4.9",
     "eslint-plugin-no-unsanitized": "^2.0.1",
     "mustache": "^2.3.0",
-    "pioneer-utils": "^1.0.8"
+    "pioneer-utils": "^1.0.9"
   }
 }
