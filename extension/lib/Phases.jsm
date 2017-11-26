@@ -101,6 +101,15 @@ this.Phases = {
   },
 
   /**
+   * Marks a survey as completed. It will no longer be shown to the user.
+   */
+  endSurvey() {
+    const state = State.load();
+    state.promptsRemaining[state.phaseName] = 0;
+    State.save(state);
+  },
+
+  /**
    * Prompts the user to take a survey.
    */
   showSurvey() {

@@ -69,6 +69,9 @@ class SurveyDoorhanger {
     browser.selectedTab = browser.addTab(this.surveyUrl);
     this.hide();
 
+    // Mark the survey as completed
+    Phases.endSurvey();
+
     // If the current phase is a survey only skip ahead
     const phase = Phases.getCurrentPhase();
     if (phase.surveyOnly) {
