@@ -22,7 +22,7 @@ const DAY = 24 * HOUR;
 const WEEK = 7 * DAY;
 
 const Config = {
-  addonId: "pioneer-study-online-news@mozilla.org",
+  addonId: "pioneer-study-online-news@pioneer.mozilla.org",
   studyName: "online-news",
   branches: [
     { name: "control", weight: 1 },
